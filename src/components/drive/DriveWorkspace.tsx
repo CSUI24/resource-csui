@@ -180,7 +180,7 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
             <DriveSkeleton />
           ) : sortedFolders.length === 0 && sortedFiles.length === 0 ? (
             <EmptyState
-              label={folderId ? "No files or folders" : "No courses"}
+              label={folderId ? "Drag and drop files here" : "No courses"}
               action={
                 <Button onClick={() => setNewFolderOpen(true)}>
                   {newFolderLabel}
