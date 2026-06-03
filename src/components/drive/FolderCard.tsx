@@ -21,6 +21,7 @@ export function FolderCard({
 }) {
   const router = useRouter();
   const isGrid = view === "grid";
+  const typeLabel = folder.parentId === null ? "Course" : "Folder";
 
   return (
     <button
@@ -61,7 +62,7 @@ export function FolderCard({
       {isGrid && <div className="truncate text-xs text-muted-foreground">{folder.itemCount} items</div>}
       {!isGrid && (
         <div className="ml-4 hidden shrink-0 text-right text-xs text-muted-foreground sm:block">
-          <div>Folder</div>
+          <div>{typeLabel}</div>
           <div>{formatRelativeDate(folder.updatedAt)}</div>
         </div>
       )}

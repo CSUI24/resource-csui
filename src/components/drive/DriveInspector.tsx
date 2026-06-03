@@ -44,6 +44,7 @@ export function DriveInspector({ target }: { target: InspectorTarget }) {
 
   if (target.kind === "folder") {
     const folder = target.folder;
+    const folderType = folder.parentId === null ? "Course" : "Folder";
     return (
       <aside className="hidden w-72 shrink-0 border-l border-border bg-background px-5 py-8 xl:block">
         <div className="flex flex-col items-center text-center">
@@ -53,11 +54,11 @@ export function DriveInspector({ target }: { target: InspectorTarget }) {
           <div className="max-w-full truncate text-base font-medium text-foreground">
             {folder.name}
           </div>
-          <div className="mt-1 text-xs text-muted-foreground">Folder</div>
+          <div className="mt-1 text-xs text-muted-foreground">{folderType}</div>
         </div>
         <InfoBlock
           rows={[
-            ["Type", "Folder"],
+            ["Type", folderType],
             ["Items", `${folder.itemCount}`],
             ["Access", "Shared"],
             ["Created by", folder.ownerLabel],

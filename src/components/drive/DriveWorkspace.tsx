@@ -231,6 +231,7 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
           onNewFolder={() => setNewFolderOpen(true)}
           newFolderLabel={newFolderLabel}
           canUpload={!isRoot}
+          canCreateFromFolder={!isRoot}
           onUpload={() => {
             setUploadFiles([]);
             setUploadNonce((value) => value + 1);
