@@ -1,13 +1,13 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { Upload } from "lucide-react";
-import { useMemo, useState } from "react";
+import { CheckCircle2, FileUp, Upload, XCircle } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { startUpload, updateFile, uploadToSignedUrl } from "@/lib/api/files";
 import { MAX_FILE_SIZE_BYTES } from "@/lib/constants";
-import { isAcceptedFileName } from "@/lib/utils";
+import { cn, formatBytes, isAcceptedFileName } from "@/lib/utils";
 import type { ResourceFileMetadata } from "@/types/file";
 
 import { Button } from "../ui/button";
@@ -37,8 +37,10 @@ export function UploadDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [rows, setRows] = useState<UploadRow[]>(() => createRows(initialFiles));
   const [uploading, setUploading] = useState(false);
+  const [isModalDragging, setIsModalDragging] = useState(false);
 
   const invalid = useMemo(
     () => rows.some((row) => !isAcceptedFileName(row.file.name) || row.file.size > MAX_FILE_SIZE_BYTES),
@@ -105,64 +107,154 @@ export function UploadDialog({
     );
   }
 
+  function addFiles(files: File[]) {
+    if (files.length === 0) return;
+    setRows((current) => [...current, ...createRows(files, current.length)]);
+  }
+
+  function handleDrop(event: React.DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    setIsModalDragging(false);
+    addFiles(Array.from(event.dataTransfer.files));
+  }
+
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !uploading && onOpenChange(nextOpen)}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-3xl gap-5">
         <DialogHeader>
-          <DialogTitle>Upload</DialogTitle>
+          <DialogTitle>Upload files</DialogTitle>
         </DialogHeader>
+
+        <input
+          ref={fileInputRef}
+          className="hidden"
+          type="file"
+          multiple
+          accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip"
+          onChange={(event) => {
+            addFiles(Array.from(event.target.files ?? []));
+            event.currentTarget.value = "";
+          }}
+        />
+
+        <div
+          className={cn(
+            "rounded-[12px] border border-dashed border-border bg-surface-soft px-5 py-4",
+            isModalDragging && "border-ring bg-background",
+          )}
+          onDragOver={(event) => {
+            event.preventDefault();
+            setIsModalDragging(true);
+          }}
+          onDragLeave={(event) => {
+            if (event.currentTarget === event.target) setIsModalDragging(false);
+          }}
+          onDrop={handleDrop}
+        >
+          <div className="flex items-center gap-4">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[10px] bg-background">
+              <FileUp className="h-5 w-5 text-foreground" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-medium text-foreground">
+                {rows.length > 0 ? `${rows.length} file${rows.length > 1 ? "s" : ""} ready` : "Drop files here"}
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">PDF, Office files, images, and ZIP. Max 50 MB each.</div>
+            </div>
+            <Button variant="secondary" disabled={uploading} onClick={() => fileInputRef.current?.click()}>
+              Choose files
+            </Button>
+          </div>
+        </div>
+
         <div className="max-h-[65vh] space-y-3 overflow-y-auto pr-1">
-          {rows.map((row) => {
-            const rowInvalid = !isAcceptedFileName(row.file.name) || row.file.size > MAX_FILE_SIZE_BYTES;
-            return (
-              <div key={row.id} className="rounded-md border border-border p-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-medium">{row.file.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {rowInvalid ? "Unsupported or over 50 MB" : row.status}
+          {rows.length === 0 ? (
+            <div
+              className="flex min-h-44 flex-col items-center justify-center rounded-[10px] border border-border bg-background text-center text-sm text-muted-foreground"
+              onDragOver={(event) => {
+                event.preventDefault();
+                setIsModalDragging(true);
+              }}
+              onDrop={handleDrop}
+            >
+              <FileUp className="mb-3 h-6 w-6 text-muted-foreground" />
+              <div>No files selected</div>
+              <button
+                type="button"
+                className="mt-2 text-xs font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Choose files
+              </button>
+            </div>
+          ) : (
+            rows.map((row) => {
+              const rowInvalid = !isAcceptedFileName(row.file.name) || row.file.size > MAX_FILE_SIZE_BYTES;
+              return (
+                <div
+                  key={row.id}
+                  className={cn(
+                    "rounded-[10px] border border-border bg-background p-4",
+                    row.status === "error" && "border-destructive",
+                  )}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] bg-surface-soft">
+                      <Upload className="h-5 w-5 text-muted-foreground" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex min-w-0 items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="truncate text-sm font-medium text-foreground">{row.file.name}</div>
+                          <div className="mt-1 text-xs text-muted-foreground">{formatBytes(row.file.size)}</div>
+                        </div>
+                        <UploadStatusBadge status={rowInvalid ? "error" : row.status} />
+                      </div>
+                      <Progress className="mt-3 h-1.5" value={row.progress} />
                     </div>
                   </div>
-                  <Upload className="h-4 w-4 text-muted-foreground" />
+
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    <div className="space-y-2 sm:col-span-2">
+                      <Label>Description</Label>
+                      <Textarea
+                        value={row.metadata.description ?? ""}
+                        onChange={(event) => patchMetadata(row.id, { description: event.target.value })}
+                        placeholder="Optional"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Week</Label>
+                      <Input
+                        type="number"
+                        min={1}
+                        value={row.metadata.week ?? ""}
+                        onChange={(event) =>
+                          patchMetadata(row.id, { week: event.target.value ? Number(event.target.value) : undefined })
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Lecturer</Label>
+                      <Input
+                        value={row.metadata.lecturer ?? ""}
+                        onChange={(event) => patchMetadata(row.id, { lecturer: event.target.value })}
+                        placeholder="Optional"
+                      />
+                    </div>
+                    <div className="space-y-2 sm:col-span-2">
+                      <Label>Tags</Label>
+                      <Input
+                        value={row.metadata.tagsText ?? ""}
+                        onChange={(event) => patchMetadata(row.id, { tagsText: event.target.value })}
+                        placeholder="Comma separated"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <Progress className="mt-3" value={row.progress} />
-                <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                  <div className="space-y-2 sm:col-span-2">
-                    <Label>Description</Label>
-                    <Textarea
-                      value={row.metadata.description ?? ""}
-                      onChange={(event) => patchMetadata(row.id, { description: event.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Week</Label>
-                    <Input
-                      type="number"
-                      min={1}
-                      value={row.metadata.week ?? ""}
-                      onChange={(event) =>
-                        patchMetadata(row.id, { week: event.target.value ? Number(event.target.value) : undefined })
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Lecturer</Label>
-                    <Input
-                      value={row.metadata.lecturer ?? ""}
-                      onChange={(event) => patchMetadata(row.id, { lecturer: event.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2 sm:col-span-2">
-                    <Label>Tags</Label>
-                    <Input
-                      value={row.metadata.tagsText ?? ""}
-                      onChange={(event) => patchMetadata(row.id, { tagsText: event.target.value })}
-                    />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
         <DialogFooter>
           <Button variant="secondary" disabled={uploading} onClick={() => onOpenChange(false)}>
@@ -174,6 +266,32 @@ export function UploadDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function UploadStatusBadge({ status }: { status: UploadRow["status"] }) {
+  if (status === "done") {
+    return (
+      <span className="inline-flex shrink-0 items-center gap-1 rounded-[6px] border border-border bg-surface-soft px-2 py-1 text-xs text-foreground">
+        <CheckCircle2 className="h-3.5 w-3.5" />
+        Done
+      </span>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <span className="inline-flex shrink-0 items-center gap-1 rounded-[6px] border border-destructive bg-background px-2 py-1 text-xs text-destructive">
+        <XCircle className="h-3.5 w-3.5" />
+        Check file
+      </span>
+    );
+  }
+
+  return (
+    <span className="inline-flex shrink-0 items-center rounded-[6px] border border-border bg-background px-2 py-1 text-xs text-muted-foreground">
+      {status === "uploading" ? "Uploading" : "Ready"}
+    </span>
   );
 }
 
@@ -189,9 +307,9 @@ function cleanMetadata(metadata: UploadRow["metadata"]): ResourceFileMetadata {
   };
 }
 
-function createRows(files: File[]): UploadRow[] {
+function createRows(files: File[], offset = 0): UploadRow[] {
   return files.map((file, index) => ({
-    id: `${file.name}-${file.lastModified}-${index}`,
+    id: `${file.name}-${file.lastModified}-${offset + index}-${crypto.randomUUID()}`,
     file,
     progress: 0,
     status: "ready",

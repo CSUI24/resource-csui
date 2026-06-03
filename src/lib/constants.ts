@@ -1,7 +1,7 @@
 export const APP_NAME = "Academic Resource Hub";
 
-export const SESSION_COOKIE = "resource_csui_session";
-export const DEV_SESSION_COOKIE = "resource_csui_dev_session";
+export const SESSION_COOKIE = "session";
+export const DEV_SESSION_COOKIE = "dev_session";
 export const DEFAULT_FOLDER_NAMES = [
   "Materi",
   "UTS",

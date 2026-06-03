@@ -41,18 +41,27 @@ export function DriveGrid({
   useGSAP(
     () => {
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      gsap.from(".drive-item", { opacity: 0, y: 8, duration: 0.25, stagger: 0.025, ease: "power1.out" });
+      gsap.from(".drive-item", {
+        opacity: 0,
+        y: 8,
+        duration: 0.25,
+        stagger: 0.025,
+        ease: "power1.out",
+      });
     },
-    { scope: containerRef, dependencies: [folders.length, files.length, view], revertOnUpdate: true },
+    {
+      scope: containerRef,
+      dependencies: [folders.length, files.length, view],
+      revertOnUpdate: true,
+    },
   );
 
   return (
-    <div
-      ref={containerRef}
-      className="space-y-8"
-    >
+    <div ref={containerRef} className="space-y-8">
       <section className="space-y-4">
-        <h2 className="text-2xl font-medium leading-8 text-foreground">Folders</h2>
+        <h2 className="text-2xl font-medium leading-8 text-foreground">
+          Folders
+        </h2>
         <div
           className={
             view === "grid"
@@ -84,7 +93,9 @@ export function DriveGrid({
               <span className="relative block h-20 w-28 shrink-0">
                 <span className="absolute left-1 top-2 h-4 w-11 rounded-t-[6px] border border-dashed border-border bg-background" />
                 <span className="absolute inset-x-0 bottom-0 flex h-16 items-center justify-center rounded-[10px] border border-dashed border-border bg-background">
-                  <span className="text-2xl leading-none text-foreground">+</span>
+                  <span className="text-2xl leading-none text-foreground">
+                    +
+                  </span>
                 </span>
               </span>
             ) : (
@@ -92,14 +103,16 @@ export function DriveGrid({
                 +
               </span>
             )}
-            <span className="min-w-0 truncate">New Folder</span>
+            <span className="min-w-0 truncate">New Course</span>
           </button>
         </div>
       </section>
 
       {files.length > 0 && (
         <section className="space-y-4">
-          <h2 className="text-2xl font-medium leading-8 text-foreground">Files</h2>
+          <h2 className="text-2xl font-medium leading-8 text-foreground">
+            Files
+          </h2>
           <div
             className={
               view === "grid"

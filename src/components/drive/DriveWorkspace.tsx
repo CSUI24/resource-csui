@@ -1,6 +1,6 @@
 "use client";
 
-import { Grid2X2, List, Search, Upload } from "lucide-react";
+import { Grid2X2, List, Upload } from "lucide-react";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import { BreadcrumbNav } from "@/components/layout/BreadcrumbNav";
@@ -17,10 +17,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Input } from "@/components/ui/input";
-import { useCreateFolder, useDeleteFolder, useFolders, useRenameFolder } from "@/lib/hooks/useFolders";
+import {
+  useCreateFolder,
+  useDeleteFolder,
+  useFolders,
+  useRenameFolder,
+} from "@/lib/hooks/useFolders";
 import { useDeleteFile, useFiles, useUpdateFile } from "@/lib/hooks/useFiles";
 import { useDragDrop } from "@/lib/hooks/useDragDrop";
 import type { ResourceFile } from "@/types/file";
@@ -39,15 +49,22 @@ type SortMode = "name" | "date";
 export function DriveWorkspace({ folderId }: { folderId: string | null }) {
   const view = useStoredView();
   const [sort, setSort] = useState<SortMode>("name");
-  const [localSearch, setLocalSearch] = useState("");
   const [newFolderOpen, setNewFolderOpen] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [uploadNonce, setUploadNonce] = useState(0);
   const [selectedFile, setSelectedFile] = useState<ResourceFile | null>(null);
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
-  const [renameTarget, setRenameTarget] = useState<{ kind: "folder"; folder: Folder } | { kind: "file"; file: ResourceFile } | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<{ kind: "folder"; folder: Folder } | { kind: "file"; file: ResourceFile } | null>(null);
+  const [renameTarget, setRenameTarget] = useState<
+    | { kind: "folder"; folder: Folder }
+    | { kind: "file"; file: ResourceFile }
+    | null
+  >(null);
+  const [deleteTarget, setDeleteTarget] = useState<
+    | { kind: "folder"; folder: Folder }
+    | { kind: "file"; file: ResourceFile }
+    | null
+  >(null);
   const [menuTarget, setMenuTarget] = useState<DriveMenuTarget | null>(null);
 
   const folders = useFolders(folderId);
@@ -81,12 +98,12 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
   }, []);
 
   const sortedFolders = useMemo(
-    () => sortFolders(filterFolders(folders.data?.folders ?? [], localSearch), sort),
-    [folders.data?.folders, localSearch, sort],
+    () => sortFolders(folders.data?.folders ?? [], sort),
+    [folders.data?.folders, sort],
   );
   const sortedFiles = useMemo(
-    () => sortFiles(filterFiles(files.data?.files ?? [], localSearch), sort),
-    [files.data?.files, localSearch, sort],
+    () => sortFiles(files.data?.files ?? [], sort),
+    [files.data?.files, sort],
   );
   const isLoading = folders.isLoading || files.isLoading;
   const selectedTarget = selectedFolder
@@ -109,7 +126,10 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
             <BreadcrumbNav folderId={folderId} />
             <div className="flex items-center gap-3">
-              <Select value={sort} onValueChange={(value) => setSort(value as SortMode)}>
+              <Select
+                value={sort}
+                onValueChange={(value) => setSort(value as SortMode)}
+              >
                 <SelectTrigger className="w-36">
                   <SelectValue />
                 </SelectTrigger>
@@ -122,7 +142,9 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
                 className="inline-flex rounded-full border border-border bg-surface-soft p-0.5"
                 type="single"
                 value={view}
-                onValueChange={(value) => value && setStoredView(value as "grid" | "list")}
+                onValueChange={(value) =>
+                  value && setStoredView(value as "grid" | "list")
+                }
               >
                 <ToggleGroupItem value="grid" aria-label="Grid">
                   <Grid2X2 className="h-4 w-4" />
@@ -134,17 +156,12 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="relative min-w-64 flex-1">
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                className="bg-background pl-10"
-                placeholder="Search..."
-                value={localSearch}
-                onChange={(event) => setLocalSearch(event.target.value)}
-              />
-            </div>
-            <Button onClick={() => window.dispatchEvent(new CustomEvent("resource:upload"))}>
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            <Button
+              onClick={() =>
+                window.dispatchEvent(new CustomEvent("resource:upload"))
+              }
+            >
               <Upload className="h-4 w-4" />
               Upload
             </Button>
@@ -153,7 +170,14 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
           {isLoading ? (
             <DriveSkeleton />
           ) : sortedFolders.length === 0 && sortedFiles.length === 0 ? (
-            <EmptyState label={folderId ? "No files or folders" : "No courses"} action={<Button onClick={() => setNewFolderOpen(true)}>New Folder</Button>} />
+            <EmptyState
+              label={folderId ? "No files or folders" : "No courses"}
+              action={
+                <Button onClick={() => setNewFolderOpen(true)}>
+                  New Folder
+                </Button>
+              }
+            />
           ) : (
             <DriveGrid
               folders={sortedFolders}
@@ -172,11 +196,21 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
               onNewFolder={() => setNewFolderOpen(true)}
               onFolderContext={(event, folder) => {
                 event.preventDefault();
-                setMenuTarget({ kind: "folder", folder, x: event.clientX, y: event.clientY });
+                setMenuTarget({
+                  kind: "folder",
+                  folder,
+                  x: event.clientX,
+                  y: event.clientY,
+                });
               }}
               onFileContext={(event, file) => {
                 event.preventDefault();
-                setMenuTarget({ kind: "file", file, x: event.clientX, y: event.clientY });
+                setMenuTarget({
+                  kind: "file",
+                  file,
+                  x: event.clientX,
+                  y: event.clientY,
+                });
               }}
             />
           )}
@@ -191,8 +225,12 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
             setUploadNonce((value) => value + 1);
             setUploadOpen(true);
           }}
-          onRenameFolder={(folder) => setRenameTarget({ kind: "folder", folder })}
-          onDeleteFolder={(folder) => setDeleteTarget({ kind: "folder", folder })}
+          onRenameFolder={(folder) =>
+            setRenameTarget({ kind: "folder", folder })
+          }
+          onDeleteFolder={(folder) =>
+            setDeleteTarget({ kind: "folder", folder })
+          }
           onRenameFile={(file) => setRenameTarget({ kind: "file", file })}
           onDeleteFile={(file) => setDeleteTarget({ kind: "file", file })}
         />
@@ -204,7 +242,9 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
         pending={createFolder.isPending}
         onOpenChange={setNewFolderOpen}
         onCreate={(name) => {
-          createFolder.mutate(name, { onSuccess: () => setNewFolderOpen(false) });
+          createFolder.mutate(name, {
+            onSuccess: () => setNewFolderOpen(false),
+          });
         }}
       />
       <UploadDialog
@@ -215,9 +255,17 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
         onOpenChange={setUploadOpen}
       />
       <RenameDialog
-        key={renameTarget?.kind === "folder" ? renameTarget.folder.id : renameTarget?.file.id ?? "rename"}
+        key={
+          renameTarget?.kind === "folder"
+            ? renameTarget.folder.id
+            : (renameTarget?.file.id ?? "rename")
+        }
         open={Boolean(renameTarget)}
-        initialName={renameTarget?.kind === "folder" ? renameTarget.folder.name : renameTarget?.file.name ?? ""}
+        initialName={
+          renameTarget?.kind === "folder"
+            ? renameTarget.folder.name
+            : (renameTarget?.file.name ?? "")
+        }
         pending={renameFolder.isPending || updateFile.isPending}
         onOpenChange={(open) => !open && setRenameTarget(null)}
         onRename={(name) => {
@@ -235,18 +283,25 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
           }
         }}
       />
-      <AlertDialog open={Boolean(deleteTarget)} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+      <AlertDialog
+        open={Boolean(deleteTarget)}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete</AlertDialogTitle>
-            <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
+            <AlertDialogDescription>
+              This cannot be undone.
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                if (deleteTarget?.kind === "folder") deleteFolder.mutate(deleteTarget.folder.id);
-                if (deleteTarget?.kind === "file") deleteFile.mutate(deleteTarget.file.id);
+                if (deleteTarget?.kind === "folder")
+                  deleteFolder.mutate(deleteTarget.folder.id);
+                if (deleteTarget?.kind === "file")
+                  deleteFile.mutate(deleteTarget.file.id);
                 setDeleteTarget(null);
               }}
             >
@@ -257,18 +312,6 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
       </AlertDialog>
     </div>
   );
-}
-
-function filterFolders(folders: Folder[], query: string) {
-  const normalized = query.trim().toLowerCase();
-  if (!normalized) return folders;
-  return folders.filter((folder) => folder.name.toLowerCase().includes(normalized));
-}
-
-function filterFiles(files: ResourceFile[], query: string) {
-  const normalized = query.trim().toLowerCase();
-  if (!normalized) return files;
-  return files.filter((file) => file.name.toLowerCase().includes(normalized));
 }
 
 function sortFolders(folders: Folder[], sort: SortMode) {
@@ -286,7 +329,11 @@ function sortFiles(files: ResourceFile[], sort: SortMode) {
 }
 
 function useStoredView(): "grid" | "list" {
-  return useSyncExternalStore<"grid" | "list">(subscribeToView, getStoredView, () => "grid");
+  return useSyncExternalStore<"grid" | "list">(
+    subscribeToView,
+    getStoredView,
+    () => "grid",
+  );
 }
 
 function subscribeToView(listener: () => void) {
