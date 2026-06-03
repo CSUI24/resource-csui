@@ -17,6 +17,7 @@ function getR2Client() {
   client = new S3Client({
     region: "auto",
     endpoint: `https://${getRequiredEnv("R2_ACCOUNT_ID")}.r2.cloudflarestorage.com`,
+    requestChecksumCalculation: "WHEN_REQUIRED",
     credentials: {
       accessKeyId: getRequiredEnv("R2_ACCESS_KEY_ID"),
       secretAccessKey: getRequiredEnv("R2_SECRET_ACCESS_KEY"),

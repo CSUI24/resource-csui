@@ -31,12 +31,12 @@ export function SearchBar({ className, initialValue = "" }: { className?: string
         router.push(`/search?q=${encodeURIComponent(value.trim())}`);
       }}
     >
-      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
       <Input
         ref={inputRef}
         value={value}
         onChange={(event) => setValue(event.target.value)}
-        className="h-9 pl-9"
+        className="pl-10"
         placeholder="Search"
       />
     </form>

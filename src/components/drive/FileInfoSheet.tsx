@@ -28,7 +28,7 @@ export function FileInfoSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent>
+      <SheetContent className="w-full max-w-lg">
         <SheetHeader>
           <SheetTitle>File Info</SheetTitle>
         </SheetHeader>
@@ -56,96 +56,96 @@ function FileInfoForm({
   const [tags, setTags] = useState(file.metadata.tags?.join(", ") ?? "");
 
   return (
-        <div className="mt-6 space-y-4">
-          <div className="space-y-2">
-            <Label>Name</Label>
-            <Input value={name} onChange={(event) => setName(event.target.value)} />
-          </div>
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div>
-              <div className="text-muted-foreground">Type</div>
-              <div>{getFileTypeLabel(file.name)}</div>
-            </div>
-            <div>
-              <div className="text-muted-foreground">Size</div>
-              <div>{formatBytes(file.sizeBytes)}</div>
-            </div>
-            <div>
-              <div className="text-muted-foreground">Created</div>
-              <div>{formatDate(file.createdAt)}</div>
-            </div>
-            <div>
-              <div className="text-muted-foreground">Updated</div>
-              <div>{formatDate(file.updatedAt)}</div>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label>Description</Label>
-            <Textarea value={description} onChange={(event) => setDescription(event.target.value)} />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label>Week</Label>
-              <Input type="number" value={week} onChange={(event) => setWeek(event.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label>Lecturer</Label>
-              <Input value={lecturer} onChange={(event) => setLecturer(event.target.value)} />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label>Tags</Label>
-            <Input value={tags} onChange={(event) => setTags(event.target.value)} />
-          </div>
-          <div className="flex flex-wrap gap-2 pt-2">
-            <Button
-              onClick={() =>
-                update.mutate({
-                  fileId: file.id,
-                  input: {
-                    name,
-                    metadata: {
-                      description,
-                      week: week ? Number(week) : undefined,
-                      lecturer,
-                      tags: tags
-                        .split(",")
-                        .map((tag) => tag.trim())
-                        .filter(Boolean),
-                    },
-                  },
-                })
-              }
-            >
-              Save
-            </Button>
-            <Button asChild variant="secondary">
-              <a href={`/api/files/${file.id}/download`}>
-                <Download className="h-4 w-4" />
-                Download
-              </a>
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                void navigator.clipboard.writeText(`${window.location.origin}/api/files/${file.id}/download`);
-                toast.success("Link copied");
-              }}
-            >
-              <Copy className="h-4 w-4" />
-              Copy link
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                remove.mutate(file.id);
-                onOpenChange(false);
-              }}
-            >
-              <Trash2 className="h-4 w-4" />
-              Delete
-            </Button>
-          </div>
+    <div className="mt-6 space-y-5">
+      <div className="space-y-2">
+        <Label>Name</Label>
+        <Input value={name} onChange={(event) => setName(event.target.value)} />
+      </div>
+      <div className="grid grid-cols-2 gap-3 rounded-[10px] border border-border bg-surface-soft p-4 text-sm">
+        <div>
+          <div className="text-xs text-muted-foreground">Type</div>
+          <div className="mt-1 truncate text-foreground">{getFileTypeLabel(file.name)}</div>
         </div>
+        <div>
+          <div className="text-xs text-muted-foreground">Size</div>
+          <div className="mt-1 truncate text-foreground">{formatBytes(file.sizeBytes)}</div>
+        </div>
+        <div>
+          <div className="text-xs text-muted-foreground">Created</div>
+          <div className="mt-1 truncate text-foreground">{formatDate(file.createdAt)}</div>
+        </div>
+        <div>
+          <div className="text-xs text-muted-foreground">Updated</div>
+          <div className="mt-1 truncate text-foreground">{formatDate(file.updatedAt)}</div>
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label>Description</Label>
+        <Textarea value={description} onChange={(event) => setDescription(event.target.value)} />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-2">
+          <Label>Week</Label>
+          <Input type="number" value={week} onChange={(event) => setWeek(event.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label>Lecturer</Label>
+          <Input value={lecturer} onChange={(event) => setLecturer(event.target.value)} />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label>Tags</Label>
+        <Input value={tags} onChange={(event) => setTags(event.target.value)} />
+      </div>
+      <div className="flex flex-wrap gap-2 pt-2">
+        <Button
+          onClick={() =>
+            update.mutate({
+              fileId: file.id,
+              input: {
+                name,
+                metadata: {
+                  description,
+                  week: week ? Number(week) : undefined,
+                  lecturer,
+                  tags: tags
+                    .split(",")
+                    .map((tag) => tag.trim())
+                    .filter(Boolean),
+                },
+              },
+            })
+          }
+        >
+          Save
+        </Button>
+        <Button asChild variant="secondary">
+          <a href={`/api/files/${file.id}/download`}>
+            <Download className="h-4 w-4" />
+            Download
+          </a>
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            void navigator.clipboard.writeText(`${window.location.origin}/api/files/${file.id}/download`);
+            toast.success("Link copied");
+          }}
+        >
+          <Copy className="h-4 w-4" />
+          Copy link
+        </Button>
+        <Button
+          variant="destructive"
+          onClick={() => {
+            remove.mutate(file.id);
+            onOpenChange(false);
+          }}
+        >
+          <Trash2 className="h-4 w-4" />
+          Delete
+        </Button>
+      </div>
+    </div>
   );
 }

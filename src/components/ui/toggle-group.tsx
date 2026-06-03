@@ -11,7 +11,7 @@ export function ToggleGroupItem({ className, ...props }: ComponentPropsWithoutRe
   return (
     <ToggleGroupPrimitive.Item
       className={cn(
-        "inline-flex h-9 w-9 items-center justify-center rounded-md border border-transparent text-muted-foreground outline-none data-[state=on]:border-border data-[state=on]:bg-background data-[state=on]:text-foreground focus-visible:ring-2 focus-visible:ring-ring",
+        "inline-flex h-10 w-10 items-center justify-center rounded-full border border-transparent text-muted-foreground outline-none data-[state=on]:border-border data-[state=on]:bg-background data-[state=on]:text-foreground focus-visible:ring-2 focus-visible:ring-ring",
         className,
       )}
       {...props}

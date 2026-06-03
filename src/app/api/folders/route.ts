@@ -10,9 +10,9 @@ export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await requireUser();
+    await requireUser();
     const parentId = request.nextUrl.searchParams.get("parentId");
-    const folders = await listFolders(user.id, parentId);
+    const folders = await listFolders(parentId);
     return json<FoldersResponse>({ folders });
   } catch {
     return error("Sign in to continue", 401);

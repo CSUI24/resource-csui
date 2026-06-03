@@ -13,10 +13,10 @@ interface DownloadContext {
 
 export async function GET(_request: NextRequest, context: DownloadContext) {
   try {
-    const user = await requireUser();
+    await requireUser();
     const { fileId } = await context.params;
     const file = await prisma.resourceFile.findFirst({
-      where: { id: fileId, ownerId: user.id, uploadStatus: "READY" },
+      where: { id: fileId, uploadStatus: "READY" },
     });
     if (!file) return error("File not found", 404);
 

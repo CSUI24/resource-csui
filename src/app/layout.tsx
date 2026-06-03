@@ -33,7 +33,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full bg-background text-foreground">
+      <body className="min-h-full bg-background text-foreground" suppressHydrationWarning>
         <ThemeProvider>
           <QueryProvider>
             {children}

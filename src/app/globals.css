@@ -11,6 +11,8 @@
   --border: #dddddd;
   --ring: #458fff;
   --surface-soft: #f8fafc;
+  --surface-strong: #e0e2e6;
+  --body: #333840;
   --destructive: #aa2d00;
   --destructive-foreground: #ffffff;
   --folder: #d9a441;
@@ -28,6 +30,8 @@
   --color-border: var(--border);
   --color-ring: var(--ring);
   --color-surface-soft: var(--surface-soft);
+  --color-surface-strong: var(--surface-strong);
+  --color-body: var(--body);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-folder: var(--folder);
@@ -47,14 +51,19 @@
   --border: #333840;
   --ring: #458fff;
   --surface-soft: #0d1218;
+  --surface-strong: #333840;
+  --body: #e0e2e6;
   --destructive: #aa2d00;
   --destructive-foreground: #ffffff;
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
+  color: var(--body);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.25;
 }
 
 * {
@@ -66,4 +75,8 @@ input,
 textarea,
 select {
   letter-spacing: 0;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--ring) 18%, transparent);
 }

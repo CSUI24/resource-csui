@@ -50,37 +50,53 @@ export function UploadDialog({
       toast.error("Open a folder first");
       return;
     }
+
+    let hasError = false;
+    let completed = 0;
     setUploading(true);
 
-    for (const row of rows) {
-      if (!isAcceptedFileName(row.file.name) || row.file.size > MAX_FILE_SIZE_BYTES) {
-        setRows((current) => current.map((item) => (item.id === row.id ? { ...item, status: "error" } : item)));
-        continue;
+    try {
+      for (const row of rows) {
+        if (!isAcceptedFileName(row.file.name) || row.file.size > MAX_FILE_SIZE_BYTES) {
+          hasError = true;
+          setRows((current) => current.map((item) => (item.id === row.id ? { ...item, status: "error" } : item)));
+          continue;
+        }
+
+        try {
+          setRows((current) => current.map((item) => (item.id === row.id ? { ...item, status: "uploading" } : item)));
+          const ticket = await startUpload({
+            name: row.file.name,
+            folderId,
+            mimeType: row.file.type || "application/octet-stream",
+            sizeBytes: row.file.size,
+            metadata: cleanMetadata(row.metadata),
+          });
+          await uploadToSignedUrl(row.file, ticket.uploadUrl, ticket.headers, (progress) => {
+            setRows((current) => current.map((item) => (item.id === row.id ? { ...item, progress } : item)));
+          });
+          await updateFile(ticket.file.id, { uploadStatus: "READY" });
+          completed += 1;
+          setRows((current) =>
+            current.map((item) => (item.id === row.id ? { ...item, status: "done", progress: 100 } : item)),
+          );
+        } catch (cause) {
+          hasError = true;
+          toast.error(cause instanceof Error ? cause.message : "Upload failed");
+          setRows((current) => current.map((item) => (item.id === row.id ? { ...item, status: "error" } : item)));
+        }
       }
 
-      try {
-        setRows((current) => current.map((item) => (item.id === row.id ? { ...item, status: "uploading" } : item)));
-        const ticket = await startUpload({
-          name: row.file.name,
-          folderId,
-          mimeType: row.file.type || "application/octet-stream",
-          sizeBytes: row.file.size,
-          metadata: cleanMetadata(row.metadata),
-        });
-        await uploadToSignedUrl(row.file, ticket.uploadUrl, ticket.headers, (progress) => {
-          setRows((current) => current.map((item) => (item.id === row.id ? { ...item, progress } : item)));
-        });
-        await updateFile(ticket.file.id, { uploadStatus: "READY" });
-        setRows((current) => current.map((item) => (item.id === row.id ? { ...item, status: "done", progress: 100 } : item)));
-      } catch (cause) {
-        toast.error(cause instanceof Error ? cause.message : "Upload failed");
-        setRows((current) => current.map((item) => (item.id === row.id ? { ...item, status: "error" } : item)));
+      await queryClient.invalidateQueries({ queryKey: ["files", folderId] });
+      await queryClient.invalidateQueries({ queryKey: ["folders"] });
+
+      if (!hasError && completed === rows.length) {
+        toast.success(completed === 1 ? "Upload complete" : "Uploads complete");
+        onOpenChange(false);
       }
+    } finally {
+      setUploading(false);
     }
-
-    await queryClient.invalidateQueries({ queryKey: ["files", folderId] });
-    await queryClient.invalidateQueries({ queryKey: ["folders"] });
-    setUploading(false);
   }
 
   function patchMetadata(id: string, metadata: Partial<UploadRow["metadata"]>) {
@@ -90,7 +106,7 @@ export function UploadDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(nextOpen) => !uploading && onOpenChange(nextOpen)}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Upload</DialogTitle>
@@ -149,7 +165,7 @@ export function UploadDialog({
           })}
         </div>
         <DialogFooter>
-          <Button variant="secondary" onClick={() => onOpenChange(false)}>
+          <Button variant="secondary" disabled={uploading} onClick={() => onOpenChange(false)}>
             Close
           </Button>
           <Button disabled={uploading || rows.length === 0 || invalid} onClick={uploadAll}>

@@ -16,9 +16,9 @@ interface FileContext {
 
 export async function GET(_request: NextRequest, context: FileContext) {
   try {
-    const user = await requireUser();
+    await requireUser();
     const { fileId } = await context.params;
-    const file = await prisma.resourceFile.findFirst({ where: { id: fileId, ownerId: user.id } });
+    const file = await prisma.resourceFile.findFirst({ where: { id: fileId } });
     if (!file) return error("File not found", 404);
     return json<FileResponse>({ file: serializeFile(file) });
   } catch {
@@ -28,12 +28,12 @@ export async function GET(_request: NextRequest, context: FileContext) {
 
 export async function PATCH(request: NextRequest, context: FileContext) {
   try {
-    const user = await requireUser();
+    await requireUser();
     const { fileId } = await context.params;
     const parsed = updateFileSchema.safeParse(await request.json());
     if (!parsed.success) return error("Check the file details and try again");
 
-    const file = await prisma.resourceFile.findFirst({ where: { id: fileId, ownerId: user.id } });
+    const file = await prisma.resourceFile.findFirst({ where: { id: fileId } });
     if (!file) return error("File not found", 404);
 
     if (parsed.data.uploadStatus === "READY") {
@@ -58,9 +58,9 @@ export async function PATCH(request: NextRequest, context: FileContext) {
 
 export async function DELETE(_request: NextRequest, context: FileContext) {
   try {
-    const user = await requireUser();
+    await requireUser();
     const { fileId } = await context.params;
-    const file = await prisma.resourceFile.findFirst({ where: { id: fileId, ownerId: user.id } });
+    const file = await prisma.resourceFile.findFirst({ where: { id: fileId } });
     if (!file) return error("File not found", 404);
 
     await prisma.resourceFile.delete({ where: { id: fileId } });

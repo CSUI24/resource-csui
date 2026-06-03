@@ -10,14 +10,13 @@ export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await requireUser();
+    await requireUser();
     const q = request.nextUrl.searchParams.get("q")?.trim();
     if (!q) return json<SearchResponse>({ folders: [], files: [] });
 
     const [folders, files] = await Promise.all([
       prisma.folder.findMany({
         where: {
-          ownerId: user.id,
           name: { contains: q, mode: "insensitive" },
         },
         include: { _count: { select: { children: true, files: { where: { uploadStatus: "READY" } } } } },
@@ -25,7 +24,6 @@ export async function GET(request: NextRequest) {
       }),
       prisma.resourceFile.findMany({
         where: {
-          ownerId: user.id,
           uploadStatus: "READY",
           OR: [
             { name: { contains: q, mode: "insensitive" } },

@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 
 import { requireUser } from "@/lib/auth/session";
 import { listFiles } from "@/lib/data/files";
-import { getFolderForOwner } from "@/lib/data/folders";
+import { getFolder } from "@/lib/data/folders";
 import { error, json } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 import { createStorageKey, createUploadUrl, getStorageUrl } from "@/lib/r2";
@@ -16,10 +16,10 @@ export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await requireUser();
+    await requireUser();
     const folderId = request.nextUrl.searchParams.get("folderId");
     if (!folderId) return json<FilesResponse>({ files: [] });
-    const files = await listFiles(user.id, folderId);
+    const files = await listFiles(folderId);
     return json<FilesResponse>({ files });
   } catch {
     return error("Sign in to continue", 401);
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     if (!parsed.success) return error("Check the file details and try again");
     if (!validateUploadName(parsed.data.name)) return error("File type is not supported", 415);
 
-    const folder = await getFolderForOwner(user.id, parsed.data.folderId);
+    const folder = await getFolder(parsed.data.folderId);
     if (!folder) return error("Folder not found", 404);
 
     const file = await prisma.resourceFile.create({

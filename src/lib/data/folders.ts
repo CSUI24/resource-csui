@@ -2,29 +2,29 @@ import { DEFAULT_FOLDER_NAMES } from "../constants";
 import { prisma } from "../prisma";
 import { serializeFolder } from "../serializers";
 
-export async function listFolders(ownerId: string, parentId: string | null) {
+export async function listFolders(parentId: string | null) {
   const folders = await prisma.folder.findMany({
-    where: { ownerId, parentId },
+    where: { parentId },
     include: { _count: { select: { children: true, files: { where: { uploadStatus: "READY" } } } } },
     orderBy: [{ isDefault: "desc" }, { name: "asc" }],
   });
   return folders.map(serializeFolder);
 }
 
-export async function getFolderForOwner(ownerId: string, folderId: string) {
+export async function getFolder(folderId: string) {
   return prisma.folder.findFirst({
-    where: { id: folderId, ownerId },
+    where: { id: folderId },
     include: { _count: { select: { children: true, files: { where: { uploadStatus: "READY" } } } } },
   });
 }
 
-export async function getBreadcrumbs(ownerId: string, folderId: string) {
+export async function getBreadcrumbs(folderId: string) {
   const breadcrumbs = [];
-  let current = await getFolderForOwner(ownerId, folderId);
+  let current = await getFolder(folderId);
 
   while (current) {
     breadcrumbs.unshift(serializeFolder(current));
-    current = current.parentId ? await getFolderForOwner(ownerId, current.parentId) : null;
+    current = current.parentId ? await getFolder(current.parentId) : null;
   }
 
   return breadcrumbs;
@@ -33,7 +33,7 @@ export async function getBreadcrumbs(ownerId: string, folderId: string) {
 export async function createFolderWithDefaults(ownerId: string, name: string, parentId: string | null) {
   return prisma.$transaction(async (tx) => {
     if (parentId) {
-      const parent = await tx.folder.findFirst({ where: { id: parentId, ownerId } });
+      const parent = await tx.folder.findFirst({ where: { id: parentId } });
       if (!parent) throw new Error("Folder not found");
     }
 

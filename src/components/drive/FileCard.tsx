@@ -21,6 +21,7 @@ export function FileCard({
   onContextMenu: (event: React.MouseEvent, file: ResourceFile) => void;
 }) {
   const extension = getExtension(file.name);
+  const isGrid = view === "grid";
   const Icon = extension.includes("ppt")
     ? Presentation
     : extension.includes("xls")
@@ -35,9 +36,9 @@ export function FileCard({
     <button
       type="button"
       className={cn(
-        "flex min-w-0 items-center gap-3 rounded-md border border-border bg-background text-left outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "flex w-full min-w-0 overflow-hidden rounded-[10px] border border-border bg-background text-left outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        isGrid ? "h-36 flex-col items-stretch justify-between p-4" : "h-14 items-center gap-3 border-transparent px-3",
         selected && "border-ring",
-        view === "grid" ? "h-28 flex-col items-start justify-between p-4" : "h-14 px-3",
       )}
       onClick={() => onSelect(file)}
       onDoubleClick={() => {
@@ -48,13 +49,24 @@ export function FileCard({
         onContextMenu(event, file);
       }}
     >
-      <Icon className={cn(iconClass, "text-file")} />
-      <div className="min-w-0">
-        <div className="truncate text-sm font-medium">{file.name}</div>
-        <div className="truncate text-xs text-muted-foreground">
-          {getFileTypeLabel(file.name)} · {formatBytes(file.sizeBytes)} · {formatDate(file.updatedAt)}
+      <div className={cn("flex min-w-0 items-center gap-3", isGrid && "w-full")}>
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] bg-surface-soft">
+          <Icon className={cn(iconClass, "text-file")} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-sm font-medium">{file.name}</div>
+          {!isGrid && (
+            <div className="truncate text-xs text-muted-foreground">
+              {getFileTypeLabel(file.name)} · {formatBytes(file.sizeBytes)} · {formatDate(file.updatedAt)}
+            </div>
+          )}
         </div>
       </div>
+      {isGrid && (
+        <div className="truncate border-t border-border pt-3 text-xs text-muted-foreground">
+          {getFileTypeLabel(file.name)} · {formatBytes(file.sizeBytes)} · {formatDate(file.updatedAt)}
+        </div>
+      )}
     </button>
   );
 }

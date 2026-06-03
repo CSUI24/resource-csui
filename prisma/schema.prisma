@@ -55,6 +55,8 @@ model Folder {
 
   @@index([ownerId, parentId])
   @@index([ownerId, parentId, name])
+  @@index([parentId, name])
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "Folder_name_trgm_idx")
 }
 
 model ResourceFile {
@@ -77,4 +79,7 @@ model ResourceFile {
   @@index([ownerId])
   @@index([ownerId, folderId, uploadStatus, name])
   @@index([ownerId, uploadStatus, updatedAt])
+  @@index([folderId, uploadStatus, name])
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "ResourceFile_name_trgm_idx")
+  @@index([metadata(ops: JsonbPathOps)], type: Gin, map: "ResourceFile_metadata_gin_idx")
 }

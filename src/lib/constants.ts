@@ -2,7 +2,13 @@ export const APP_NAME = "Academic Resource Hub";
 
 export const SESSION_COOKIE = "resource_csui_session";
 export const DEV_SESSION_COOKIE = "resource_csui_dev_session";
-export const DEFAULT_FOLDER_NAMES = ["Materi", "UAS"] as const;
+export const DEFAULT_FOLDER_NAMES = [
+  "Materi",
+  "UTS",
+  "UAS",
+  "Kuis",
+  "Tugas",
+] as const;
 
 export const ACCEPTED_EXTENSIONS = [
   ".pdf",

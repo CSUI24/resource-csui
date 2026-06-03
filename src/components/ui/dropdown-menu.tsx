@@ -16,7 +16,7 @@ export function DropdownMenuContent({
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
-        className={cn("z-50 min-w-40 rounded-md border border-border bg-background p-1 shadow-sm", className)}
+        className={cn("z-50 min-w-40 rounded-[10px] border border-border bg-background p-1 shadow-sm", className)}
         sideOffset={4}
         {...props}
       />
@@ -28,7 +28,7 @@ export function DropdownMenuItem({ className, ...props }: ComponentPropsWithoutR
   return (
     <DropdownMenuPrimitive.Item
       className={cn(
-        "flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-2 text-sm outline-none focus:bg-muted",
+        "flex cursor-default select-none items-center gap-2 rounded-[6px] px-2 py-2 text-sm outline-none focus:bg-surface-soft",
         className,
       )}
       {...props}

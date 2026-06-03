@@ -16,7 +16,7 @@ export function DialogContent({ className, children, ...props }: ComponentPropsW
       <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/20" />
       <DialogPrimitive.Content
         className={cn(
-          "fixed left-1/2 top-1/2 z-50 grid w-[calc(100vw-32px)] max-w-md -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-background p-6 shadow-sm outline-none",
+          "fixed left-1/2 top-1/2 z-50 grid w-[calc(100vw-32px)] max-w-md -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[12px] border border-border bg-background p-6 shadow-sm outline-none",
           className,
         )}
         {...props}
@@ -36,7 +36,7 @@ export function DialogHeader({ className, ...props }: ComponentPropsWithoutRef<"
 }
 
 export function DialogTitle({ className, ...props }: ComponentPropsWithoutRef<typeof DialogPrimitive.Title>) {
-  return <DialogPrimitive.Title className={cn("text-lg font-medium", className)} {...props} />;
+  return <DialogPrimitive.Title className={cn("text-lg font-medium leading-6 text-foreground", className)} {...props} />;
 }
 
 export function DialogDescription({
