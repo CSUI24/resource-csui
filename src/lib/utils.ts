@@ -36,6 +36,28 @@ export function getFileTypeLabel(name: string) {
   return FILE_TYPE_LABELS[extension] ?? "File";
 }
 
+export function isImageFile(name: string, mimeType?: string) {
+  const extension = getExtension(name);
+  return (
+    mimeType?.startsWith("image/") ||
+    [".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"].includes(extension)
+  );
+}
+
+export function isPdfFile(name: string, mimeType?: string) {
+  return mimeType === "application/pdf" || getExtension(name) === ".pdf";
+}
+
+export function isPresentationFile(name: string, mimeType?: string) {
+  const extension = getExtension(name);
+  return (
+    extension === ".ppt" ||
+    extension === ".pptx" ||
+    mimeType === "application/vnd.ms-powerpoint" ||
+    mimeType === "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+  );
+}
+
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }

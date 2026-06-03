@@ -40,6 +40,7 @@ import { ContextMenu, type DriveMenuTarget } from "./ContextMenu";
 import { DriveGrid } from "./DriveGrid";
 import { DriveInspector } from "./DriveInspector";
 import { DropZone } from "./DropZone";
+import { FilePreviewDialog } from "./FilePreviewDialog";
 import { NewFolderDialog } from "./NewFolderDialog";
 import { RenameDialog } from "./RenameDialog";
 import { UploadDialog } from "./UploadDialog";
@@ -59,6 +60,7 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
   const [uploadNonce, setUploadNonce] = useState(0);
   const [selectedFile, setSelectedFile] = useState<ResourceFile | null>(null);
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
+  const [previewFile, setPreviewFile] = useState<ResourceFile | null>(null);
   const [renameTarget, setRenameTarget] = useState<
     | { kind: "folder"; folder: Folder }
     | { kind: "file"; file: ResourceFile }
@@ -201,6 +203,7 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
               onSelectFile={(file) => {
                 setSelectedFile(file);
                 setSelectedFolder(null);
+                setPreviewFile(file);
               }}
               onNewFolder={() => setNewFolderOpen(true)}
               onFolderContext={(event, folder) => {
@@ -244,6 +247,11 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
             setDeleteTarget({ kind: "folder", folder })
           }
           onRenameFile={(file) => setRenameTarget({ kind: "file", file })}
+          onPreviewFile={(file) => {
+            setSelectedFile(file);
+            setSelectedFolder(null);
+            setPreviewFile(file);
+          }}
           onDeleteFile={(file) => setDeleteTarget({ kind: "file", file })}
         />
       </DropZone>
@@ -266,6 +274,11 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
         folderId={folderId}
         initialFiles={uploadFiles}
         onOpenChange={setUploadOpen}
+      />
+      <FilePreviewDialog
+        file={previewFile}
+        open={Boolean(previewFile)}
+        onOpenChange={(open) => !open && setPreviewFile(null)}
       />
       <RenameDialog
         key={

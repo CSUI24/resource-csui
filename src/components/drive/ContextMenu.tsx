@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Download, Edit3, FolderPlus, Trash2, Upload } from "lucide-react";
+import { Copy, Download, Edit3, Eye, FolderPlus, Trash2, Upload } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 import {
@@ -29,6 +29,7 @@ export function ContextMenu({
   onRenameFolder,
   onDeleteFolder,
   onRenameFile,
+  onPreviewFile,
   onDeleteFile,
 }: {
   target: DriveMenuTarget | null;
@@ -41,6 +42,7 @@ export function ContextMenu({
   onRenameFolder: (folder: Folder) => void;
   onDeleteFolder: (folder: Folder) => void;
   onRenameFile: (file: ResourceFile) => void;
+  onPreviewFile: (file: ResourceFile) => void;
   onDeleteFile: (file: ResourceFile) => void;
 }) {
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -102,6 +104,10 @@ export function ContextMenu({
         )}
         {target?.kind === "file" && (
           <>
+            <DropdownMenuItem onSelect={() => onPreviewFile(target.file)}>
+              <Eye className="h-4 w-4" />
+              Preview
+            </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => onRenameFile(target.file)}>
               <Edit3 className="h-4 w-4" />
               Rename

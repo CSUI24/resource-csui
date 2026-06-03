@@ -66,6 +66,18 @@ export async function createDownloadUrl(key: string, fileName: string) {
   );
 }
 
+export async function createPreviewUrl(key: string, fileName: string) {
+  return getSignedUrl(
+    getR2Client(),
+    new GetObjectCommand({
+      Bucket: getR2Bucket(),
+      Key: key,
+      ResponseContentDisposition: `inline; filename="${fileName.replace(/"/g, "")}"`,
+    }),
+    { expiresIn: 60 * 5 },
+  );
+}
+
 export async function verifyObject(key: string, expectedBytes: number) {
   const result = await getR2Client().send(
     new HeadObjectCommand({
