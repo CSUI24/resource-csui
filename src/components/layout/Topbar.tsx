@@ -67,13 +67,8 @@ export function Topbar() {
               <div className="truncate text-sm font-medium text-foreground">{user?.name ?? "Student"}</div>
               <div className="truncate text-xs text-muted-foreground">{user?.email ?? user?.username ?? "Signed in"}</div>
             </div>
-            <DropdownMenuSeparator className="my-1 h-px bg-border" />
-            <DropdownMenuItem asChild>
-              <a href="/api/auth/logout">
-                <LogOut className="h-4 w-4" />
-                Logout
-              </a>
-            </DropdownMenuItem>
+            {/* <DropdownMenuSeparator className="my-1 h-px bg-border" /> */}
+            
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

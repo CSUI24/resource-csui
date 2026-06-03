@@ -10,7 +10,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const loginUrl = new URL("/api/auth/sso/login", request.url);
+  const loginUrl = new URL("/login", request.url);
   return NextResponse.redirect(loginUrl);
 }
 
