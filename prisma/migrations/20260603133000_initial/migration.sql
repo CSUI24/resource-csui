@@ -80,6 +80,9 @@ CREATE INDEX "Session_expiresAt_idx" ON "Session"("expiresAt");
 CREATE INDEX "Folder_ownerId_parentId_idx" ON "Folder"("ownerId", "parentId");
 
 -- CreateIndex
+CREATE INDEX "Folder_ownerId_parentId_name_idx" ON "Folder"("ownerId", "parentId", "name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "ResourceFile_storageKey_key" ON "ResourceFile"("storageKey");
 
 -- CreateIndex
@@ -87,6 +90,12 @@ CREATE INDEX "ResourceFile_folderId_idx" ON "ResourceFile"("folderId");
 
 -- CreateIndex
 CREATE INDEX "ResourceFile_ownerId_idx" ON "ResourceFile"("ownerId");
+
+-- CreateIndex
+CREATE INDEX "ResourceFile_ownerId_folderId_uploadStatus_name_idx" ON "ResourceFile"("ownerId", "folderId", "uploadStatus", "name");
+
+-- CreateIndex
+CREATE INDEX "ResourceFile_ownerId_uploadStatus_updatedAt_idx" ON "ResourceFile"("ownerId", "uploadStatus", "updatedAt");
 
 -- AddForeignKey
 ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

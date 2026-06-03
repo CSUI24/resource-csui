@@ -54,6 +54,7 @@ model Folder {
   files     ResourceFile[]
 
   @@index([ownerId, parentId])
+  @@index([ownerId, parentId, name])
 }
 
 model ResourceFile {
@@ -74,4 +75,6 @@ model ResourceFile {
 
   @@index([folderId])
   @@index([ownerId])
+  @@index([ownerId, folderId, uploadStatus, name])
+  @@index([ownerId, uploadStatus, updatedAt])
 }
