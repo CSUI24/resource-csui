@@ -2,25 +2,68 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #181d26;
+  --primary: #181d26;
+  --primary-active: #0d1218;
+  --primary-foreground: #ffffff;
+  --muted: #f8fafc;
+  --muted-foreground: #41454d;
+  --border: #dddddd;
+  --ring: #458fff;
+  --surface-soft: #f8fafc;
+  --destructive: #aa2d00;
+  --destructive-foreground: #ffffff;
+  --folder: #d9a441;
+  --file: #254fad;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-active: var(--primary-active);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-surface-soft: var(--surface-soft);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-folder: var(--folder);
+  --color-file: var(--file);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark {
+  --background: #181d26;
+  --foreground: #ffffff;
+  --primary: #ffffff;
+  --primary-active: #e0e2e6;
+  --primary-foreground: #181d26;
+  --muted: #1d1f25;
+  --muted-foreground: #e0e2e6;
+  --border: #333840;
+  --ring: #458fff;
+  --surface-soft: #0d1218;
+  --destructive: #aa2d00;
+  --destructive-foreground: #ffffff;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+textarea,
+select {
+  letter-spacing: 0;
 }
