@@ -19,7 +19,10 @@ export async function GET(request: NextRequest) {
         where: {
           name: { contains: q, mode: "insensitive" },
         },
-        include: { _count: { select: { children: true, files: { where: { uploadStatus: "READY" } } } } },
+        include: {
+          owner: { select: { name: true, username: true, email: true } },
+          _count: { select: { children: true, files: { where: { uploadStatus: "READY" } } } },
+        },
         take: 20,
       }),
       prisma.resourceFile.findMany({
@@ -32,6 +35,7 @@ export async function GET(request: NextRequest) {
             { metadata: { path: ["tags"], array_contains: [q] } },
           ],
         },
+        include: { owner: { select: { name: true, username: true, email: true } } },
         take: 30,
       }),
     ]);

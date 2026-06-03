@@ -41,7 +41,10 @@ export async function PATCH(request: NextRequest, context: FolderContext) {
     const updated = await prisma.folder.update({
       where: { id: folderId },
       data: { name: parsed.data.name },
-      include: { _count: { select: { children: true, files: { where: { uploadStatus: "READY" } } } } },
+      include: {
+        owner: { select: { name: true, username: true, email: true } },
+        _count: { select: { children: true, files: { where: { uploadStatus: "READY" } } } },
+      },
     });
 
     return json<FolderResponse>({ folder: serializeFolder(updated) });

@@ -18,7 +18,10 @@ export async function GET(_request: NextRequest, context: FileContext) {
   try {
     await requireUser();
     const { fileId } = await context.params;
-    const file = await prisma.resourceFile.findFirst({ where: { id: fileId } });
+    const file = await prisma.resourceFile.findFirst({
+      where: { id: fileId },
+      include: { owner: { select: { name: true, username: true, email: true } } },
+    });
     if (!file) return error("File not found", 404);
     return json<FileResponse>({ file: serializeFile(file) });
   } catch {
@@ -33,7 +36,10 @@ export async function PATCH(request: NextRequest, context: FileContext) {
     const parsed = updateFileSchema.safeParse(await request.json());
     if (!parsed.success) return error("Check the file details and try again");
 
-    const file = await prisma.resourceFile.findFirst({ where: { id: fileId } });
+    const file = await prisma.resourceFile.findFirst({
+      where: { id: fileId },
+      include: { owner: { select: { name: true, username: true, email: true } } },
+    });
     if (!file) return error("File not found", 404);
 
     if (parsed.data.uploadStatus === "READY") {
@@ -48,6 +54,7 @@ export async function PATCH(request: NextRequest, context: FileContext) {
         metadata: parsed.data.metadata,
         uploadStatus: parsed.data.uploadStatus,
       },
+      include: { owner: { select: { name: true, username: true, email: true } } },
     });
 
     return json<FileResponse>({ file: serializeFile(updated) });

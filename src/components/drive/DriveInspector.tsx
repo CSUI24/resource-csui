@@ -39,6 +39,7 @@ export function DriveInspector({ target }: { target: InspectorTarget }) {
             ["Type", "Folder"],
             ["Items", `${folder.itemCount}`],
             ["Access", "Shared"],
+            ["Created by", folder.ownerLabel],
             ["Modified", formatDate(folder.updatedAt)],
             ["Created", formatDate(folder.createdAt)],
           ]}
@@ -63,6 +64,7 @@ export function DriveInspector({ target }: { target: InspectorTarget }) {
           ["Type", getFileTypeLabel(file.name)],
           ["Size", formatBytes(file.sizeBytes)],
           ["Access", "Shared"],
+          ["Uploaded by", file.ownerLabel],
           ["Modified", formatDate(file.updatedAt)],
           ["Created", formatDate(file.createdAt)],
         ]}

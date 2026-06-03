@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
         storageKey,
         storageUrl: `/api/files/${file.id}/download`,
       },
+      include: { owner: { select: { name: true, username: true, email: true } } },
     });
     const uploadUrl = await createUploadUrl(storageKey, parsed.data.mimeType);
 

@@ -5,7 +5,10 @@ import { serializeFolder } from "../serializers";
 export async function listFolders(parentId: string | null) {
   const folders = await prisma.folder.findMany({
     where: { parentId },
-    include: { _count: { select: { children: true, files: { where: { uploadStatus: "READY" } } } } },
+    include: {
+      owner: { select: { name: true, username: true, email: true } },
+      _count: { select: { children: true, files: { where: { uploadStatus: "READY" } } } },
+    },
     orderBy: [{ isDefault: "desc" }, { name: "asc" }],
   });
   return folders.map(serializeFolder);
@@ -14,7 +17,10 @@ export async function listFolders(parentId: string | null) {
 export async function getFolder(folderId: string) {
   return prisma.folder.findFirst({
     where: { id: folderId },
-    include: { _count: { select: { children: true, files: { where: { uploadStatus: "READY" } } } } },
+    include: {
+      owner: { select: { name: true, username: true, email: true } },
+      _count: { select: { children: true, files: { where: { uploadStatus: "READY" } } } },
+    },
   });
 }
 
@@ -39,7 +45,10 @@ export async function createFolderWithDefaults(ownerId: string, name: string, pa
 
     const folder = await tx.folder.create({
       data: { name, parentId, ownerId },
-      include: { _count: { select: { children: true, files: true } } },
+      include: {
+        owner: { select: { name: true, username: true, email: true } },
+        _count: { select: { children: true, files: true } },
+      },
     });
 
     if (parentId === null) {

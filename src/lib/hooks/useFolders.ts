@@ -37,6 +37,7 @@ export function useCreateFolder(parentId: string | null) {
         name,
         parentId,
         ownerId: "optimistic",
+        ownerLabel: "Y***",
         isDefault: false,
         itemCount: 0,
         createdAt: new Date().toISOString(),

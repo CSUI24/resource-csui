@@ -8,6 +8,7 @@ type FolderWithCounts = {
   name: string;
   parentId: string | null;
   ownerId: string;
+  owner?: OwnerIdentity | null;
   isDefault: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -22,6 +23,7 @@ type FileModel = {
   name: string;
   folderId: string;
   ownerId: string;
+  owner?: OwnerIdentity | null;
   mimeType: string;
   sizeBytes: number;
   storageUrl: string;
@@ -30,12 +32,19 @@ type FileModel = {
   updatedAt: Date;
 };
 
+type OwnerIdentity = {
+  name?: string | null;
+  username?: string | null;
+  email?: string | null;
+};
+
 export function serializeFolder(folder: FolderWithCounts): Folder {
   return {
     id: folder.id,
     name: folder.name,
     parentId: folder.parentId,
     ownerId: folder.ownerId,
+    ownerLabel: serializeOwnerLabel(folder.owner),
     isDefault: folder.isDefault,
     itemCount: (folder._count?.children ?? 0) + (folder._count?.files ?? 0),
     createdAt: folder.createdAt.toISOString(),
@@ -59,6 +68,7 @@ export function serializeFile(file: FileModel): ResourceFile {
     name: file.name,
     folderId: file.folderId,
     ownerId: file.ownerId,
+    ownerLabel: serializeOwnerLabel(file.owner),
     mimeType: file.mimeType,
     sizeBytes: file.sizeBytes,
     storageUrl: file.storageUrl,
@@ -66,4 +76,23 @@ export function serializeFile(file: FileModel): ResourceFile {
     createdAt: file.createdAt.toISOString(),
     updatedAt: file.updatedAt.toISOString(),
   };
+}
+
+function serializeOwnerLabel(owner?: OwnerIdentity | null) {
+  const source = owner?.name || owner?.username || owner?.email?.split("@")[0] || "";
+  if (!source.trim()) return "U***";
+
+  const parts = source
+    .replace(/[^a-zA-Z0-9\s._-]/g, " ")
+    .split(/[\s._-]+/)
+    .filter(Boolean)
+    .slice(0, 2);
+
+  if (parts.length === 0) return "U***";
+  return parts.map(maskPart).join(" ");
+}
+
+function maskPart(value: string) {
+  const initial = value[0]?.toUpperCase() ?? "U";
+  return `${initial}***`;
 }

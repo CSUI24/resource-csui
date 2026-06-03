@@ -10,6 +10,7 @@ export interface ResourceFile {
   name: string;
   folderId: string;
   ownerId: string;
+  ownerLabel: string;
   mimeType: string;
   sizeBytes: number;
   storageUrl: string;
