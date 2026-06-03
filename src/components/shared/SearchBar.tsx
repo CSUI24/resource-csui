@@ -7,7 +7,15 @@ import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-export function SearchBar({ className, initialValue = "" }: { className?: string; initialValue?: string }) {
+export function SearchBar({
+  className,
+  initialValue = "",
+  placeholder = "Search",
+}: {
+  className?: string;
+  initialValue?: string;
+  placeholder?: string;
+}) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState(initialValue);
@@ -37,7 +45,7 @@ export function SearchBar({ className, initialValue = "" }: { className?: string
         value={value}
         onChange={(event) => setValue(event.target.value)}
         className="pl-10"
-        placeholder="Search"
+        placeholder={placeholder}
       />
     </form>
   );

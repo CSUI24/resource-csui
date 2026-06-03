@@ -36,9 +36,11 @@ export function FileCard({
     <button
       type="button"
       className={cn(
-        "flex w-full min-w-0 overflow-hidden rounded-[10px] border border-border bg-background text-left outline-none focus-visible:ring-2 focus-visible:ring-ring",
-        isGrid ? "h-36 flex-col items-stretch justify-between p-4" : "h-14 items-center gap-3 border-transparent px-3",
-        selected && "border-ring",
+        "flex w-full min-w-0 overflow-hidden border border-border bg-background text-left outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        isGrid
+          ? "h-36 flex-col items-stretch justify-between rounded-[10px] p-4"
+          : "h-16 items-center rounded-[6px] border-transparent px-3",
+        selected && (isGrid ? "border-ring" : "bg-surface-soft"),
       )}
       onClick={() => onSelect(file)}
       onDoubleClick={() => {
@@ -49,7 +51,7 @@ export function FileCard({
         onContextMenu(event, file);
       }}
     >
-      <div className={cn("flex min-w-0 items-center gap-3", isGrid && "w-full")}>
+      <div className={cn("flex min-w-0 items-center gap-3", isGrid ? "w-full" : "flex-1")}>
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] bg-surface-soft">
           <Icon className={cn(iconClass, "text-file")} />
         </span>
@@ -65,6 +67,12 @@ export function FileCard({
       {isGrid && (
         <div className="truncate border-t border-border pt-3 text-xs text-muted-foreground">
           {getFileTypeLabel(file.name)} · {formatBytes(file.sizeBytes)} · {formatDate(file.updatedAt)}
+        </div>
+      )}
+      {!isGrid && (
+        <div className="ml-4 hidden shrink-0 text-right text-xs text-muted-foreground sm:block">
+          <div>{formatBytes(file.sizeBytes)}</div>
+          <div>{formatDate(file.updatedAt)}</div>
         </div>
       )}
     </button>

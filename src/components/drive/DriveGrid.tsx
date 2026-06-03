@@ -57,7 +57,7 @@ export function DriveGrid({
           className={
             view === "grid"
               ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
-              : "space-y-2 rounded-[10px] border border-border bg-background p-2"
+              : "divide-y divide-border rounded-[10px] border border-border bg-background p-1"
           }
         >
           {folders.map((folder) => (
@@ -75,13 +75,24 @@ export function DriveGrid({
             type="button"
             className={
               view === "grid"
-                ? "drive-item flex h-40 min-w-0 flex-col items-center justify-center gap-3 rounded-[10px] border border-dashed border-border bg-background text-sm font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                : "drive-item flex h-14 min-w-0 items-center justify-center gap-3 rounded-[10px] border border-dashed border-border bg-background text-sm font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                ? "drive-item flex h-40 min-w-0 flex-col items-center justify-center gap-3 rounded-[10px] text-sm font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                : "drive-item flex h-16 min-w-0 items-center gap-3 rounded-[6px] border border-transparent bg-background px-3 text-sm font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
             }
             onClick={onNewFolder}
           >
-            <span className="text-2xl leading-none text-foreground">+</span>
-            New Folder
+            {view === "grid" ? (
+              <span className="relative block h-20 w-28 shrink-0">
+                <span className="absolute left-1 top-2 h-4 w-11 rounded-t-[6px] border border-dashed border-border bg-background" />
+                <span className="absolute inset-x-0 bottom-0 flex h-16 items-center justify-center rounded-[10px] border border-dashed border-border bg-background">
+                  <span className="text-2xl leading-none text-foreground">+</span>
+                </span>
+              </span>
+            ) : (
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] border border-dashed border-border text-xl leading-none text-foreground">
+                +
+              </span>
+            )}
+            <span className="min-w-0 truncate">New Folder</span>
           </button>
         </div>
       </section>
@@ -93,7 +104,7 @@ export function DriveGrid({
             className={
               view === "grid"
                 ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
-                : "space-y-2 rounded-[10px] border border-border bg-background p-2"
+                : "divide-y divide-border rounded-[10px] border border-border bg-background p-1"
             }
           >
             {files.map((file) => (
