@@ -89,7 +89,7 @@ export function DriveInspector({ target }: { target: InspectorTarget }) {
           ["Type", getFileTypeLabel(file.name)],
           ["Size", formatBytes(file.sizeBytes)],
           ["Access", "Shared"],
-          ["Uploaded by", file.ownerLabel],
+          ["Contributor", file.ownerLabel],
           ["Modified", formatDate(file.updatedAt)],
           ["Created", formatDate(file.createdAt)],
         ]}

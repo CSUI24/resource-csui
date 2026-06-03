@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { startUpload, updateFile, uploadToSignedUrl } from "@/lib/api/files";
 import { MAX_FILE_SIZE_BYTES } from "@/lib/constants";
 import { cn, formatBytes, isAcceptedFileName } from "@/lib/utils";
+import { useSession } from "@/lib/hooks/useSession";
 import type { ResourceFileMetadata } from "@/types/file";
 
 import { Button } from "../ui/button";
@@ -37,10 +38,13 @@ export function UploadDialog({
   onOpenChange: (open: boolean) => void;
 }) {
   const queryClient = useQueryClient();
+  const session = useSession();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [rows, setRows] = useState<UploadRow[]>(() => createRows(initialFiles));
   const [uploading, setUploading] = useState(false);
   const [isModalDragging, setIsModalDragging] = useState(false);
+  const [contributorVisibility, setContributorVisibility] =
+    useState<NonNullable<ResourceFileMetadata["contributorVisibility"]>>("initials");
 
   const invalid = useMemo(
     () => rows.some((row) => !isAcceptedFileName(row.file.name) || row.file.size > MAX_FILE_SIZE_BYTES),
@@ -72,7 +76,7 @@ export function UploadDialog({
             folderId,
             mimeType: row.file.type || "application/octet-stream",
             sizeBytes: row.file.size,
-            metadata: cleanMetadata(row.metadata),
+            metadata: cleanMetadata(row.metadata, contributorVisibility),
           });
           await uploadToSignedUrl(row.file, ticket.uploadUrl, ticket.headers, (progress) => {
             setRows((current) => current.map((item) => (item.id === row.id ? { ...item, progress } : item)));
@@ -164,6 +168,37 @@ export function UploadDialog({
             <Button variant="secondary" disabled={uploading} onClick={() => fileInputRef.current?.click()}>
               Choose files
             </Button>
+          </div>
+        </div>
+
+        <div className="grid gap-3 rounded-[10px] border border-border bg-background p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+          <div className="min-w-0">
+            <div className="text-sm font-medium text-foreground">Contributor display</div>
+            <div className="mt-1 truncate text-xs text-muted-foreground">
+              Shown as {getContributorPreview(session.data?.user?.name ?? session.data?.user?.username ?? "Student", contributorVisibility)}
+            </div>
+          </div>
+          <div className="inline-flex rounded-full border border-border bg-surface-soft p-0.5">
+            <button
+              type="button"
+              className={cn(
+                "h-9 rounded-full px-3 text-xs font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                contributorVisibility === "initials" && "bg-background text-foreground",
+              )}
+              onClick={() => setContributorVisibility("initials")}
+            >
+              Initials
+            </button>
+            <button
+              type="button"
+              className={cn(
+                "h-9 rounded-full px-3 text-xs font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                contributorVisibility === "full" && "bg-background text-foreground",
+              )}
+              onClick={() => setContributorVisibility("full")}
+            >
+              Full name
+            </button>
           </div>
         </div>
 
@@ -295,11 +330,15 @@ function UploadStatusBadge({ status }: { status: UploadRow["status"] }) {
   );
 }
 
-function cleanMetadata(metadata: UploadRow["metadata"]): ResourceFileMetadata {
+function cleanMetadata(
+  metadata: UploadRow["metadata"],
+  contributorVisibility: NonNullable<ResourceFileMetadata["contributorVisibility"]>,
+): ResourceFileMetadata {
   return {
     description: metadata.description || undefined,
     week: metadata.week || undefined,
     lecturer: metadata.lecturer || undefined,
+    contributorVisibility,
     tags: metadata.tagsText
       ?.split(",")
       .map((tag) => tag.trim())
@@ -315,4 +354,14 @@ function createRows(files: File[], offset = 0): UploadRow[] {
     status: "ready",
     metadata: {},
   }));
+}
+
+function getContributorPreview(name: string, visibility: NonNullable<ResourceFileMetadata["contributorVisibility"]>) {
+  if (visibility === "full") return name;
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => `${part[0]?.toUpperCase() ?? "U"}***`)
+    .join(" ");
 }

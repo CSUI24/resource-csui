@@ -14,6 +14,7 @@ export const fileMetadataSchema = z.object({
   week: z.coerce.number().int().min(1).max(24).optional().or(z.literal("")),
   tags: z.array(z.string().trim().min(1).max(32)).max(12).optional(),
   lecturer: z.string().trim().max(120).optional().or(z.literal("")),
+  contributorVisibility: z.enum(["initials", "full"]).optional(),
 });
 
 export const createFolderSchema = z.object({

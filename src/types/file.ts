@@ -3,6 +3,7 @@ export interface ResourceFileMetadata {
   week?: number;
   tags?: string[];
   lecturer?: string;
+  contributorVisibility?: "initials" | "full";
 }
 
 export interface ResourceFile {
