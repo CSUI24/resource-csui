@@ -47,6 +47,10 @@ import { UploadDialog } from "./UploadDialog";
 type SortMode = "name" | "date";
 
 export function DriveWorkspace({ folderId }: { folderId: string | null }) {
+  const isRoot = folderId === null;
+  const folderSectionLabel = isRoot ? "Courses" : "Folders";
+  const newFolderLabel = isRoot ? "New Course" : "New Folder";
+  const folderDialogLabel = isRoot ? "Course" : "Folder";
   const view = useStoredView();
   const [sort, setSort] = useState<SortMode>("name");
   const [newFolderOpen, setNewFolderOpen] = useState(false);
@@ -117,6 +121,7 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
       <DropZone
         isDragging={drag.isDragging}
         dragHandlers={drag}
+        disabled={isRoot}
         onContextMenu={(event) => {
           event.preventDefault();
           setMenuTarget({ kind: "canvas", x: event.clientX, y: event.clientY });
@@ -157,14 +162,16 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
           </div>
 
           <div className="flex flex-wrap items-center justify-end gap-3">
-            <Button
-              onClick={() =>
-                window.dispatchEvent(new CustomEvent("resource:upload"))
-              }
-            >
-              <Upload className="h-4 w-4" />
-              Upload
-            </Button>
+            {!isRoot && (
+              <Button
+                onClick={() =>
+                  window.dispatchEvent(new CustomEvent("resource:upload"))
+                }
+              >
+                <Upload className="h-4 w-4" />
+                Upload
+              </Button>
+            )}
           </div>
 
           {isLoading ? (
@@ -174,7 +181,7 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
               label={folderId ? "No files or folders" : "No courses"}
               action={
                 <Button onClick={() => setNewFolderOpen(true)}>
-                  New Folder
+                  {newFolderLabel}
                 </Button>
               }
             />
@@ -185,6 +192,8 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
               view={view}
               selectedFolder={selectedFolder}
               selectedFile={selectedFile}
+              folderSectionLabel={folderSectionLabel}
+              newFolderLabel={newFolderLabel}
               onSelectFolder={(folder) => {
                 setSelectedFolder(folder);
                 setSelectedFile(null);
@@ -220,6 +229,8 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
           target={menuTarget}
           onOpenChange={(open) => !open && setMenuTarget(null)}
           onNewFolder={() => setNewFolderOpen(true)}
+          newFolderLabel={newFolderLabel}
+          canUpload={!isRoot}
           onUpload={() => {
             setUploadFiles([]);
             setUploadNonce((value) => value + 1);
@@ -240,6 +251,7 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
       <NewFolderDialog
         open={newFolderOpen}
         pending={createFolder.isPending}
+        label={folderDialogLabel}
         onOpenChange={setNewFolderOpen}
         onCreate={(name) => {
           createFolder.mutate(name, {

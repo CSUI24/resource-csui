@@ -18,11 +18,13 @@ export function NewFolderDialog({
   onOpenChange,
   onCreate,
   pending,
+  label = "Folder",
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCreate: (name: string) => void;
   pending: boolean;
+  label?: "Course" | "Folder";
 }) {
   const [name, setName] = useState("");
 
@@ -36,7 +38,7 @@ export function NewFolderDialog({
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New Folder</DialogTitle>
+          <DialogTitle>New {label}</DialogTitle>
         </DialogHeader>
         <form
           className="space-y-4"
@@ -47,7 +49,7 @@ export function NewFolderDialog({
           }}
         >
           <div className="space-y-2">
-            <Label htmlFor="folder-name">Name</Label>
+            <Label htmlFor="folder-name">{label} name</Label>
             <Input id="folder-name" value={name} onChange={(event) => setName(event.target.value)} autoFocus />
           </div>
           <DialogFooter>

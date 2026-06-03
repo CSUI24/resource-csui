@@ -12,7 +12,13 @@ import { useSession } from "@/lib/hooks/useSession";
 import type { ResourceFileMetadata } from "@/types/file";
 
 import { Button } from "../ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Progress } from "../ui/progress";
@@ -44,10 +50,17 @@ export function UploadDialog({
   const [uploading, setUploading] = useState(false);
   const [isModalDragging, setIsModalDragging] = useState(false);
   const [contributorVisibility, setContributorVisibility] =
-    useState<NonNullable<ResourceFileMetadata["contributorVisibility"]>>("initials");
+    useState<NonNullable<ResourceFileMetadata["contributorVisibility"]>>(
+      "initials",
+    );
 
   const invalid = useMemo(
-    () => rows.some((row) => !isAcceptedFileName(row.file.name) || row.file.size > MAX_FILE_SIZE_BYTES),
+    () =>
+      rows.some(
+        (row) =>
+          !isAcceptedFileName(row.file.name) ||
+          row.file.size > MAX_FILE_SIZE_BYTES,
+      ),
     [rows],
   );
 
@@ -63,14 +76,25 @@ export function UploadDialog({
 
     try {
       for (const row of rows) {
-        if (!isAcceptedFileName(row.file.name) || row.file.size > MAX_FILE_SIZE_BYTES) {
+        if (
+          !isAcceptedFileName(row.file.name) ||
+          row.file.size > MAX_FILE_SIZE_BYTES
+        ) {
           hasError = true;
-          setRows((current) => current.map((item) => (item.id === row.id ? { ...item, status: "error" } : item)));
+          setRows((current) =>
+            current.map((item) =>
+              item.id === row.id ? { ...item, status: "error" } : item,
+            ),
+          );
           continue;
         }
 
         try {
-          setRows((current) => current.map((item) => (item.id === row.id ? { ...item, status: "uploading" } : item)));
+          setRows((current) =>
+            current.map((item) =>
+              item.id === row.id ? { ...item, status: "uploading" } : item,
+            ),
+          );
           const ticket = await startUpload({
             name: row.file.name,
             folderId,
@@ -78,18 +102,35 @@ export function UploadDialog({
             sizeBytes: row.file.size,
             metadata: cleanMetadata(row.metadata, contributorVisibility),
           });
-          await uploadToSignedUrl(row.file, ticket.uploadUrl, ticket.headers, (progress) => {
-            setRows((current) => current.map((item) => (item.id === row.id ? { ...item, progress } : item)));
-          });
+          await uploadToSignedUrl(
+            row.file,
+            ticket.uploadUrl,
+            ticket.headers,
+            (progress) => {
+              setRows((current) =>
+                current.map((item) =>
+                  item.id === row.id ? { ...item, progress } : item,
+                ),
+              );
+            },
+          );
           await updateFile(ticket.file.id, { uploadStatus: "READY" });
           completed += 1;
           setRows((current) =>
-            current.map((item) => (item.id === row.id ? { ...item, status: "done", progress: 100 } : item)),
+            current.map((item) =>
+              item.id === row.id
+                ? { ...item, status: "done", progress: 100 }
+                : item,
+            ),
           );
         } catch (cause) {
           hasError = true;
           toast.error(cause instanceof Error ? cause.message : "Upload failed");
-          setRows((current) => current.map((item) => (item.id === row.id ? { ...item, status: "error" } : item)));
+          setRows((current) =>
+            current.map((item) =>
+              item.id === row.id ? { ...item, status: "error" } : item,
+            ),
+          );
         }
       }
 
@@ -107,7 +148,11 @@ export function UploadDialog({
 
   function patchMetadata(id: string, metadata: Partial<UploadRow["metadata"]>) {
     setRows((current) =>
-      current.map((row) => (row.id === id ? { ...row, metadata: { ...row.metadata, ...metadata } } : row)),
+      current.map((row) =>
+        row.id === id
+          ? { ...row, metadata: { ...row.metadata, ...metadata } }
+          : row,
+      ),
     );
   }
 
@@ -123,7 +168,10 @@ export function UploadDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => !uploading && onOpenChange(nextOpen)}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => !uploading && onOpenChange(nextOpen)}
+    >
       <DialogContent className="max-w-3xl gap-5">
         <DialogHeader>
           <DialogTitle>Upload files</DialogTitle>
@@ -161,11 +209,19 @@ export function UploadDialog({
             </span>
             <div className="min-w-0 flex-1">
               <div className="text-sm font-medium text-foreground">
-                {rows.length > 0 ? `${rows.length} file${rows.length > 1 ? "s" : ""} ready` : "Drop files here"}
+                {rows.length > 0
+                  ? `${rows.length} file${rows.length > 1 ? "s" : ""} ready`
+                  : "Drop files here"}
               </div>
-              <div className="mt-1 text-xs text-muted-foreground">PDF, Office files, images, and ZIP. Max 50 MB each.</div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                PDF, Office files, images, and ZIP. Max 50 MB each.
+              </div>
             </div>
-            <Button variant="secondary" disabled={uploading} onClick={() => fileInputRef.current?.click()}>
+            <Button
+              variant="secondary"
+              disabled={uploading}
+              onClick={() => fileInputRef.current?.click()}
+            >
               Choose files
             </Button>
           </div>
@@ -173,9 +229,17 @@ export function UploadDialog({
 
         <div className="grid gap-3 rounded-[10px] border border-border bg-background p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
           <div className="min-w-0">
-            <div className="text-sm font-medium text-foreground">Contributor display</div>
+            <div className="text-sm font-medium text-foreground">
+              Contributor display
+            </div>
             <div className="mt-1 truncate text-xs text-muted-foreground">
-              Shown as {getContributorPreview(session.data?.user?.name ?? session.data?.user?.username ?? "Student", contributorVisibility)}
+              Shown as{" "}
+              {getContributorPreview(
+                session.data?.user?.name ??
+                  session.data?.user?.username ??
+                  "Student",
+                contributorVisibility,
+              )}
             </div>
           </div>
           <div className="inline-flex rounded-full border border-border bg-surface-soft p-0.5">
@@ -183,7 +247,8 @@ export function UploadDialog({
               type="button"
               className={cn(
                 "h-9 rounded-full px-3 text-xs font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                contributorVisibility === "initials" && "bg-background text-foreground",
+                contributorVisibility === "initials" &&
+                  "bg-background text-foreground",
               )}
               onClick={() => setContributorVisibility("initials")}
             >
@@ -193,7 +258,8 @@ export function UploadDialog({
               type="button"
               className={cn(
                 "h-9 rounded-full px-3 text-xs font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                contributorVisibility === "full" && "bg-background text-foreground",
+                contributorVisibility === "full" &&
+                  "bg-background text-foreground",
               )}
               onClick={() => setContributorVisibility("full")}
             >
@@ -224,7 +290,9 @@ export function UploadDialog({
             </div>
           ) : (
             rows.map((row) => {
-              const rowInvalid = !isAcceptedFileName(row.file.name) || row.file.size > MAX_FILE_SIZE_BYTES;
+              const rowInvalid =
+                !isAcceptedFileName(row.file.name) ||
+                row.file.size > MAX_FILE_SIZE_BYTES;
               return (
                 <div
                   key={row.id}
@@ -240,10 +308,16 @@ export function UploadDialog({
                     <div className="min-w-0 flex-1">
                       <div className="flex min-w-0 items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <div className="truncate text-sm font-medium text-foreground">{row.file.name}</div>
-                          <div className="mt-1 text-xs text-muted-foreground">{formatBytes(row.file.size)}</div>
+                          <div className="truncate text-sm font-medium text-foreground">
+                            {row.file.name}
+                          </div>
+                          <div className="mt-1 text-xs text-muted-foreground">
+                            {formatBytes(row.file.size)}
+                          </div>
                         </div>
-                        <UploadStatusBadge status={rowInvalid ? "error" : row.status} />
+                        <UploadStatusBadge
+                          status={rowInvalid ? "error" : row.status}
+                        />
                       </div>
                       <Progress className="mt-3 h-1.5" value={row.progress} />
                     </div>
@@ -254,7 +328,11 @@ export function UploadDialog({
                       <Label>Description</Label>
                       <Textarea
                         value={row.metadata.description ?? ""}
-                        onChange={(event) => patchMetadata(row.id, { description: event.target.value })}
+                        onChange={(event) =>
+                          patchMetadata(row.id, {
+                            description: event.target.value,
+                          })
+                        }
                         placeholder="Optional"
                       />
                     </div>
@@ -264,8 +342,13 @@ export function UploadDialog({
                         type="number"
                         min={1}
                         value={row.metadata.week ?? ""}
+                        placeholder="Optional"
                         onChange={(event) =>
-                          patchMetadata(row.id, { week: event.target.value ? Number(event.target.value) : undefined })
+                          patchMetadata(row.id, {
+                            week: event.target.value
+                              ? Number(event.target.value)
+                              : undefined,
+                          })
                         }
                       />
                     </div>
@@ -273,7 +356,11 @@ export function UploadDialog({
                       <Label>Lecturer</Label>
                       <Input
                         value={row.metadata.lecturer ?? ""}
-                        onChange={(event) => patchMetadata(row.id, { lecturer: event.target.value })}
+                        onChange={(event) =>
+                          patchMetadata(row.id, {
+                            lecturer: event.target.value,
+                          })
+                        }
                         placeholder="Optional"
                       />
                     </div>
@@ -281,8 +368,12 @@ export function UploadDialog({
                       <Label>Tags</Label>
                       <Input
                         value={row.metadata.tagsText ?? ""}
-                        onChange={(event) => patchMetadata(row.id, { tagsText: event.target.value })}
-                        placeholder="Comma separated"
+                        onChange={(event) =>
+                          patchMetadata(row.id, {
+                            tagsText: event.target.value,
+                          })
+                        }
+                        placeholder="Comma separated (Optional)"
                       />
                     </div>
                   </div>
@@ -292,10 +383,17 @@ export function UploadDialog({
           )}
         </div>
         <DialogFooter>
-          <Button variant="secondary" disabled={uploading} onClick={() => onOpenChange(false)}>
+          <Button
+            variant="secondary"
+            disabled={uploading}
+            onClick={() => onOpenChange(false)}
+          >
             Close
           </Button>
-          <Button disabled={uploading || rows.length === 0 || invalid} onClick={uploadAll}>
+          <Button
+            disabled={uploading || rows.length === 0 || invalid}
+            onClick={uploadAll}
+          >
             Upload
           </Button>
         </DialogFooter>
@@ -332,7 +430,9 @@ function UploadStatusBadge({ status }: { status: UploadRow["status"] }) {
 
 function cleanMetadata(
   metadata: UploadRow["metadata"],
-  contributorVisibility: NonNullable<ResourceFileMetadata["contributorVisibility"]>,
+  contributorVisibility: NonNullable<
+    ResourceFileMetadata["contributorVisibility"]
+  >,
 ): ResourceFileMetadata {
   return {
     description: metadata.description || undefined,
@@ -356,7 +456,10 @@ function createRows(files: File[], offset = 0): UploadRow[] {
   }));
 }
 
-function getContributorPreview(name: string, visibility: NonNullable<ResourceFileMetadata["contributorVisibility"]>) {
+function getContributorPreview(
+  name: string,
+  visibility: NonNullable<ResourceFileMetadata["contributorVisibility"]>,
+) {
   if (visibility === "full") return name;
   return name
     .split(" ")

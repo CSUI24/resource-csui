@@ -23,6 +23,8 @@ export function ContextMenu({
   onOpenChange,
   onNewFolder,
   onUpload,
+  newFolderLabel = "New Folder",
+  canUpload = true,
   onRenameFolder,
   onDeleteFolder,
   onRenameFile,
@@ -32,6 +34,8 @@ export function ContextMenu({
   onOpenChange: (open: boolean) => void;
   onNewFolder: () => void;
   onUpload: () => void;
+  newFolderLabel?: string;
+  canUpload?: boolean;
   onRenameFolder: (folder: Folder) => void;
   onDeleteFolder: (folder: Folder) => void;
   onRenameFile: (file: ResourceFile) => void;
@@ -59,12 +63,14 @@ export function ContextMenu({
           <>
             <DropdownMenuItem onSelect={onNewFolder}>
               <FolderPlus className="h-4 w-4" />
-              New Folder
+              {newFolderLabel}
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={onUpload}>
-              <Upload className="h-4 w-4" />
-              Upload
-            </DropdownMenuItem>
+            {canUpload && (
+              <DropdownMenuItem onSelect={onUpload}>
+                <Upload className="h-4 w-4" />
+                Upload
+              </DropdownMenuItem>
+            )}
           </>
         )}
         {target?.kind === "folder" && (
@@ -84,7 +90,7 @@ export function ContextMenu({
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={onNewFolder}>
               <FolderPlus className="h-4 w-4" />
-              New Folder
+              {newFolderLabel}
             </DropdownMenuItem>
           </>
         )}

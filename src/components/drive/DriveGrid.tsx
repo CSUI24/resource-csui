@@ -19,6 +19,8 @@ export function DriveGrid({
   selectedFolder,
   selectedFile,
   view,
+  folderSectionLabel,
+  newFolderLabel,
   onSelectFolder,
   onSelectFile,
   onNewFolder,
@@ -30,6 +32,8 @@ export function DriveGrid({
   selectedFolder: Folder | null;
   selectedFile: ResourceFile | null;
   view: "grid" | "list";
+  folderSectionLabel: string;
+  newFolderLabel: string;
   onSelectFolder: (folder: Folder) => void;
   onSelectFile: (file: ResourceFile) => void;
   onNewFolder: () => void;
@@ -60,7 +64,7 @@ export function DriveGrid({
     <div ref={containerRef} className="space-y-8">
       <section className="space-y-4">
         <h2 className="text-2xl font-medium leading-8 text-foreground">
-          Folders
+          {folderSectionLabel}
         </h2>
         <div
           className={
@@ -103,7 +107,7 @@ export function DriveGrid({
                 +
               </span>
             )}
-            <span className="min-w-0 truncate">New Course</span>
+            <span className="min-w-0 truncate">{newFolderLabel}</span>
           </button>
         </div>
       </section>

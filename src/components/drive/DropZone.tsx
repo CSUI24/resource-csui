@@ -10,6 +10,7 @@ export function DropZone({
   children,
   dragHandlers,
   onContextMenu,
+  disabled = false,
 }: {
   isDragging: boolean;
   children: ReactNode;
@@ -19,14 +20,15 @@ export function DropZone({
     onDrop: (event: React.DragEvent) => void;
   };
   onContextMenu: (event: React.MouseEvent) => void;
+  disabled?: boolean;
 }) {
   return (
     <div
       className="relative min-h-[calc(100dvh-64px)] min-w-0 flex-1 bg-surface-soft px-4 py-6 lg:px-8 lg:py-8"
       onContextMenu={onContextMenu}
-      onDragOver={dragHandlers.onDragOver}
-      onDragLeave={dragHandlers.onDragLeave}
-      onDrop={dragHandlers.onDrop}
+      onDragOver={disabled ? undefined : dragHandlers.onDragOver}
+      onDragLeave={disabled ? undefined : dragHandlers.onDragLeave}
+      onDrop={disabled ? undefined : dragHandlers.onDrop}
     >
       {children}
       <div

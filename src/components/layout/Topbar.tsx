@@ -24,8 +24,13 @@ export function Topbar() {
   const courses = useFolders(null);
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
-  const title = pathname.startsWith("/search") ? "Search" : "Folders";
-  const subtitle = pathname.startsWith("/search") ? "Find shared resources" : "Shared academic resources";
+  const isDriveRoot = pathname === "/drive";
+  const title = pathname.startsWith("/search") ? "Search" : isDriveRoot ? "Courses" : "Folders";
+  const subtitle = pathname.startsWith("/search")
+    ? "Find shared resources"
+    : isDriveRoot
+      ? "Shared course roots"
+      : "Course materials and files";
   const user = session.data?.user;
   const initials = useMemo(() => getInitials(user?.name ?? user?.username ?? "Student"), [user?.name, user?.username]);
 
