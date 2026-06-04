@@ -13,3 +13,4 @@ src/generated/prisma/
 
 .DS_STORE
 **/.DS_Store
+.vercel
