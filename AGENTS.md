@@ -15,6 +15,7 @@ A file management app for university students — think Google Drive, but scoped
 
 ## User Mental Model
 
+
 A student opens the app and sees their courses as folders. Inside each course: **Materi** and **UAS** (always there, can't be removed). They can add more subfolders, upload files, and find anything fast.
 
 That's it. The UI should never make them think harder than that.
