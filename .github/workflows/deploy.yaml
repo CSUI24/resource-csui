@@ -1,20 +1,37 @@
-name: Deploy Production to vercel
+name: Vercel Deployment
+
 on:
   push:
     branches:
       - master
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.PROJECT_PROD_ID }}
+
 jobs:
-  deploy:
+  deploy-production:
     runs-on: ubuntu-latest
+    concurrency:
+      group: vercel-production
+      cancel-in-progress: true
     steps:
-      - uses: actions/checkout@v2
-      - uses: ngduc/vercel-deploy-action@master
-        with:
-          vercel-cli: vercel
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-args: "--prod"
-          vercel-org-id: ${{ secrets.ORG_ID}}
-          vercel-project-id: ${{ secrets.PROJECT_PROD_ID}}
-          working-directory: ./
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
+      - uses: actions/checkout@v4
+
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9 --activate
+          pnpm --version
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project Artifacts
+        run: vercel deploy --prebuilt --prod --yes --archive=tgz --token=${{ secrets.VERCEL_TOKEN }}
