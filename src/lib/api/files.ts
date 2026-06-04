@@ -35,12 +35,6 @@ export function updateFile(
   });
 }
 
-export function deleteFile(fileId: string) {
-  return apiFetch<{ ok: true }>(`/api/files/${fileId}`, {
-    method: "DELETE",
-  });
-}
-
 export function uploadToSignedUrl(
   file: File,
   uploadUrl: string,

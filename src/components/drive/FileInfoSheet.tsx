@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Download, Trash2 } from "lucide-react";
+import { Copy, Download } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
-import { useDeleteFile, useUpdateFile } from "@/lib/hooks/useFiles";
+import { useUpdateFile } from "@/lib/hooks/useFiles";
 import { formatBytes, formatDate, getFileTypeLabel } from "@/lib/utils";
 import type { ResourceFile } from "@/types/file";
 
@@ -32,7 +32,7 @@ export function FileInfoSheet({
         <SheetHeader>
           <SheetTitle>File Info</SheetTitle>
         </SheetHeader>
-        <FileInfoForm key={file.id} file={file} folderId={folderId} onOpenChange={onOpenChange} />
+        <FileInfoForm key={file.id} file={file} folderId={folderId} />
       </SheetContent>
     </Sheet>
   );
@@ -41,14 +41,11 @@ export function FileInfoSheet({
 function FileInfoForm({
   file,
   folderId,
-  onOpenChange,
 }: {
   file: ResourceFile;
   folderId: string | null;
-  onOpenChange: (open: boolean) => void;
 }) {
   const update = useUpdateFile(folderId);
-  const remove = useDeleteFile(folderId);
   const [name, setName] = useState(file.name);
   const [description, setDescription] = useState(file.metadata.description ?? "");
   const [week, setWeek] = useState(file.metadata.week ? String(file.metadata.week) : "");
@@ -134,16 +131,6 @@ function FileInfoForm({
         >
           <Copy className="h-4 w-4" />
           Copy link
-        </Button>
-        <Button
-          variant="destructive"
-          onClick={() => {
-            remove.mutate(file.id);
-            onOpenChange(false);
-          }}
-        >
-          <Trash2 className="h-4 w-4" />
-          Delete
         </Button>
       </div>
     </div>

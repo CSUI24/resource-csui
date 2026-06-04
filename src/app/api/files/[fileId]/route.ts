@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { requireUser } from "@/lib/auth/session";
 import { error, json } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
-import { deleteObject, verifyObject } from "@/lib/r2";
+import { verifyObject } from "@/lib/r2";
 import { serializeFile } from "@/lib/serializers";
 import { updateFileSchema } from "@/lib/validation";
 import type { FileResponse } from "@/types/api";
@@ -63,17 +63,6 @@ export async function PATCH(request: NextRequest, context: FileContext) {
   }
 }
 
-export async function DELETE(_request: NextRequest, context: FileContext) {
-  try {
-    await requireUser();
-    const { fileId } = await context.params;
-    const file = await prisma.resourceFile.findFirst({ where: { id: fileId } });
-    if (!file) return error("File not found", 404);
-
-    await prisma.resourceFile.delete({ where: { id: fileId } });
-    await deleteObject(file.storageKey).catch(() => undefined);
-    return json({ ok: true });
-  } catch {
-    return error("File could not be deleted", 400);
-  }
+export function DELETE() {
+  return error("Files cannot be deleted", 405);
 }

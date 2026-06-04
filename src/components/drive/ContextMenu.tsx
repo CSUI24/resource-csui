@@ -30,7 +30,6 @@ export function ContextMenu({
   onDeleteFolder,
   onRenameFile,
   onPreviewFile,
-  onDeleteFile,
 }: {
   target: DriveMenuTarget | null;
   onOpenChange: (open: boolean) => void;
@@ -43,7 +42,6 @@ export function ContextMenu({
   onDeleteFolder: (folder: Folder) => void;
   onRenameFile: (file: ResourceFile) => void;
   onPreviewFile: (file: ResourceFile) => void;
-  onDeleteFile: (file: ResourceFile) => void;
 }) {
   const triggerRef = useRef<HTMLButtonElement>(null);
 
@@ -127,10 +125,6 @@ export function ContextMenu({
             >
               <Copy className="h-4 w-4" />
               Copy link
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => onDeleteFile(target.file)}>
-              <Trash2 className="h-4 w-4" />
-              Delete
             </DropdownMenuItem>
           </>
         )}

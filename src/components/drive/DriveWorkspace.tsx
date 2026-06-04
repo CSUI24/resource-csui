@@ -31,7 +31,7 @@ import {
   useFolders,
   useRenameFolder,
 } from "@/lib/hooks/useFolders";
-import { useDeleteFile, useFiles, useUpdateFile } from "@/lib/hooks/useFiles";
+import { useFiles, useUpdateFile } from "@/lib/hooks/useFiles";
 import { useDragDrop } from "@/lib/hooks/useDragDrop";
 import type { ResourceFile } from "@/types/file";
 import type { Folder } from "@/types/folder";
@@ -67,9 +67,7 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
     | null
   >(null);
   const [deleteTarget, setDeleteTarget] = useState<
-    | { kind: "folder"; folder: Folder }
-    | { kind: "file"; file: ResourceFile }
-    | null
+    { kind: "folder"; folder: Folder } | null
   >(null);
   const [menuTarget, setMenuTarget] = useState<DriveMenuTarget | null>(null);
 
@@ -79,7 +77,6 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
   const renameFolder = useRenameFolder(folderId);
   const deleteFolder = useDeleteFolder(folderId);
   const updateFile = useUpdateFile(folderId);
-  const deleteFile = useDeleteFile(folderId);
 
   const drag = useDragDrop((filesToUpload) => {
     if (!folderId) return;
@@ -252,7 +249,6 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
             setSelectedFolder(null);
             setPreviewFile(file);
           }}
-          onDeleteFile={(file) => setDeleteTarget({ kind: "file", file })}
         />
       </DropZone>
       <DriveInspector target={selectedTarget} />
@@ -326,8 +322,6 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
               onClick={() => {
                 if (deleteTarget?.kind === "folder")
                   deleteFolder.mutate(deleteTarget.folder.id);
-                if (deleteTarget?.kind === "file")
-                  deleteFile.mutate(deleteTarget.file.id);
                 setDeleteTarget(null);
               }}
             >
