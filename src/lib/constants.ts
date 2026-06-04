@@ -1,4 +1,4 @@
-export const APP_NAME = "Academic Resource Hub";
+export const APP_NAME = "Pacil Resource";
 
 export const SESSION_COOKIE = "session";
 export const DEV_SESSION_COOKIE = "dev_session";

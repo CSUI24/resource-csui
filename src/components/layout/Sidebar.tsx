@@ -22,7 +22,6 @@ export function Sidebar() {
           <span className="block truncate text-base font-medium leading-5 text-foreground">
             Resource Pacil
           </span>
-          {/* <span className="block truncate text-xs leading-4 text-muted-foreground">Academic Hub</span> */}
         </Link>
       </div>
       <div className="flex-1 overflow-y-auto px-4 py-5">

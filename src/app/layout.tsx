@@ -18,8 +18,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Academic Resource Hub",
-  description: "Course-scoped academic resource management",
+  title: "Pacil Resource",
+  description:
+    "A hub for sharing academic resources among Computer Science students at Universitas Indonesia.",
 };
 
 export default function RootLayout({
@@ -33,7 +34,10 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full bg-background text-foreground" suppressHydrationWarning>
+      <body
+        className="min-h-full bg-background text-foreground"
+        suppressHydrationWarning
+      >
         <ThemeProvider>
           <QueryProvider>
             {children}
