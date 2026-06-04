@@ -2,12 +2,14 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { getSsoLoginUrl, validateCasTicket } from "@/lib/auth/cas";
 import { createApplicationSession, setSessionCookie } from "@/lib/auth/session";
+import { getAppBaseUrl } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
   // TODO: integrate SSO per SSO.md
+  const appBaseUrl = getAppBaseUrl();
   const ticket = request.nextUrl.searchParams.get("ticket");
   if (!ticket) {
     return NextResponse.redirect(getSsoLoginUrl());
@@ -15,7 +17,7 @@ export async function GET(request: NextRequest) {
 
   const casUser = await validateCasTicket(ticket);
   if (!casUser) {
-    return NextResponse.redirect(new URL("/api/auth/sso/login?error=sso_failed", request.url));
+    return NextResponse.redirect(new URL("/api/auth/sso/login?error=sso_failed", appBaseUrl));
   }
 
   const user = await prisma.user.upsert({
@@ -35,7 +37,7 @@ export async function GET(request: NextRequest) {
   });
 
   const token = await createApplicationSession(user.id);
-  const response = NextResponse.redirect(new URL("/drive", request.url));
+  const response = NextResponse.redirect(new URL("/drive", appBaseUrl));
   setSessionCookie(response, token);
   return response;
 }
