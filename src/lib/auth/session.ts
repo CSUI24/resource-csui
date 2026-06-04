@@ -9,6 +9,7 @@ import { isDevAuthEnabled } from "../env";
 import { prisma } from "../prisma";
 
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
+const EXPIRED_COOKIE_DATE = "Thu, 01 Jan 1970 00:00:00 GMT";
 
 const devUser: SessionUser = {
   id: "dev-user",
@@ -39,19 +40,60 @@ export async function createApplicationSession(userId: string) {
   return token;
 }
 
-export function setSessionCookie(response: NextResponse, token: string) {
-  response.cookies.set(SESSION_COOKIE, token, {
+function getSessionCookieDomain() {
+  const domain = process.env.SESSION_COOKIE_DOMAIN?.trim().replace(/^\./, "");
+  return domain || undefined;
+}
+
+function getSessionCookieOptions() {
+  const domain = getSessionCookieDomain();
+  return {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: "lax" as const,
     path: "/",
+    ...(domain ? { domain } : {}),
+  };
+}
+
+function appendHostOnlyCookieDeletion(response: NextResponse, name: string) {
+  const cookieParts = [
+    `${name}=`,
+    "Path=/",
+    `Expires=${EXPIRED_COOKIE_DATE}`,
+    "Max-Age=0",
+    "SameSite=Lax",
+    "HttpOnly",
+  ];
+
+  if (process.env.NODE_ENV === "production") {
+    cookieParts.push("Secure");
+  }
+
+  response.headers.append("Set-Cookie", cookieParts.join("; "));
+}
+
+export function setSessionCookie(response: NextResponse, token: string) {
+  response.cookies.set(SESSION_COOKIE, token, {
+    ...getSessionCookieOptions(),
     maxAge: SESSION_MAX_AGE_SECONDS,
   });
+
+  if (getSessionCookieDomain()) {
+    appendHostOnlyCookieDeletion(response, SESSION_COOKIE);
+  }
 }
 
 export function clearSessionCookie(response: NextResponse) {
-  response.cookies.delete(SESSION_COOKIE);
+  response.cookies.delete({
+    name: SESSION_COOKIE,
+    ...getSessionCookieOptions(),
+  });
   response.cookies.delete(DEV_SESSION_COOKIE);
+
+  if (getSessionCookieDomain()) {
+    appendHostOnlyCookieDeletion(response, SESSION_COOKIE);
+  }
 }
 
 export async function getCurrentUser(): Promise<SessionUser | null> {
