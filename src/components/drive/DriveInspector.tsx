@@ -19,7 +19,7 @@ import {
 import type { ResourceFile } from "@/types/file";
 import type { Folder } from "@/types/folder";
 
-type InspectorTarget =
+export type InspectorTarget =
   | { kind: "folder"; folder: Folder }
   | { kind: "file"; file: ResourceFile }
   | null;

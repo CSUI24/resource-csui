@@ -34,10 +34,10 @@ export function FolderCard({
         !isGrid && selected && "bg-surface-soft",
         isGrid && selected && "bg-surface-soft",
       )}
-      onClick={() => onSelect(folder)}
-      onDoubleClick={() => router.push(`/drive/${folder.id}`)}
+      onClick={() => router.push(`/drive/${folder.id}`)}
       onContextMenu={(event) => {
         event.stopPropagation();
+        onSelect(folder);
         onContextMenu(event, folder);
       }}
     >

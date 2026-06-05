@@ -38,7 +38,7 @@ import type { Folder } from "@/types/folder";
 
 import { ContextMenu, type DriveMenuTarget } from "./ContextMenu";
 import { DriveGrid } from "./DriveGrid";
-import { DriveInspector } from "./DriveInspector";
+import { DriveInspector, type InspectorTarget } from "./DriveInspector";
 import { DropZone } from "./DropZone";
 import { FilePreviewDialog } from "./FilePreviewDialog";
 import { NewFolderDialog } from "./NewFolderDialog";
@@ -61,6 +61,7 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
   const [uploadNonce, setUploadNonce] = useState(0);
   const [selectedFile, setSelectedFile] = useState<ResourceFile | null>(null);
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
+  const [detailTarget, setDetailTarget] = useState<InspectorTarget>(null);
   const [previewFile, setPreviewFile] = useState<ResourceFile | null>(null);
   const [renameTarget, setRenameTarget] = useState<
     | { kind: "folder"; folder: Folder }
@@ -110,24 +111,17 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
     [files.data?.files, sort],
   );
   const isLoading = folders.isLoading || files.isLoading;
-  const selectedTarget = selectedFolder
-    ? { kind: "folder" as const, folder: selectedFolder }
-    : selectedFile
-      ? { kind: "file" as const, file: selectedFile }
-      : null;
-
   useEffect(() => {
-    if (!selectedFile && !selectedFolder) return;
+    if (!detailTarget) return;
 
     const closeInspector = (event: KeyboardEvent) => {
       if (event.key !== "Escape" || event.defaultPrevented) return;
-      setSelectedFile(null);
-      setSelectedFolder(null);
+      setDetailTarget(null);
     };
 
     window.addEventListener("keydown", closeInspector);
     return () => window.removeEventListener("keydown", closeInspector);
-  }, [selectedFile, selectedFolder]);
+  }, [detailTarget]);
 
   return (
     <div className="relative flex h-[calc(100dvh-64px)] min-h-0 min-w-0 overflow-hidden">
@@ -288,19 +282,18 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
           onShowFolderDetails={(folder) => {
             setSelectedFolder(folder);
             setSelectedFile(null);
+            setDetailTarget({ kind: "folder", folder });
           }}
           onShowFileDetails={(file) => {
             setSelectedFile(file);
             setSelectedFolder(null);
+            setDetailTarget({ kind: "file", file });
           }}
         />
       </DropZone>
       <DriveInspector
-        target={selectedTarget}
-        onClose={() => {
-          setSelectedFile(null);
-          setSelectedFolder(null);
-        }}
+        target={detailTarget}
+        onClose={() => setDetailTarget(null)}
       />
 
       <NewFolderDialog
