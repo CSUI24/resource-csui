@@ -116,7 +116,7 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
       : null;
 
   return (
-    <div className="flex min-h-[calc(100dvh-64px)] min-w-0">
+    <div className="flex h-[calc(100dvh-64px)] min-h-0 min-w-0 overflow-hidden">
       <DropZone
         isDragging={drag.isDragging}
         dragHandlers={drag}
@@ -126,41 +126,43 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
           setMenuTarget({ kind: "canvas", x: event.clientX, y: event.clientY });
         }}
       >
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
-            <BreadcrumbNav folderId={folderId} />
-            <div className="flex items-center gap-3">
-              <Select
-                value={sort}
-                onValueChange={(value) => setSort(value as SortMode)}
-              >
-                <SelectTrigger className="w-36">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="name">Name</SelectItem>
-                  <SelectItem value="date">Date</SelectItem>
-                </SelectContent>
-              </Select>
-              <ToggleGroup
-                className="inline-flex rounded-full border border-border bg-surface-soft p-0.5"
-                type="single"
-                value={view}
-                onValueChange={(value) =>
-                  value && setStoredView(value as "grid" | "list")
-                }
-              >
-                <ToggleGroupItem value="grid" aria-label="Grid">
-                  <Grid2X2 className="h-4 w-4" />
-                </ToggleGroupItem>
-                <ToggleGroupItem value="list" aria-label="List">
-                  <List className="h-4 w-4" />
-                </ToggleGroupItem>
-              </ToggleGroup>
+        <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col gap-6">
+          <div className="shrink-0 border-b border-border pb-4">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <BreadcrumbNav folderId={folderId} />
+              <div className="flex items-center gap-3">
+                <Select
+                  value={sort}
+                  onValueChange={(value) => setSort(value as SortMode)}
+                >
+                  <SelectTrigger className="w-36">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="name">Name</SelectItem>
+                    <SelectItem value="date">Date</SelectItem>
+                  </SelectContent>
+                </Select>
+                <ToggleGroup
+                  className="inline-flex rounded-full border border-border bg-surface-soft p-0.5"
+                  type="single"
+                  value={view}
+                  onValueChange={(value) =>
+                    value && setStoredView(value as "grid" | "list")
+                  }
+                >
+                  <ToggleGroupItem value="grid" aria-label="Grid">
+                    <Grid2X2 className="h-4 w-4" />
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="list" aria-label="List">
+                    <List className="h-4 w-4" />
+                  </ToggleGroupItem>
+                </ToggleGroup>
+              </div>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-end gap-3">
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-3">
             {!isRoot && (
               <Button
                 onClick={() =>
@@ -173,56 +175,60 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
             )}
           </div>
 
-          {isLoading ? (
-            <DriveSkeleton />
-          ) : sortedFolders.length === 0 && sortedFiles.length === 0 ? (
-            <EmptyState
-              label={folderId ? "Drag and drop files here" : "No courses"}
-              action={
-                <Button onClick={() => setNewFolderOpen(true)}>
-                  {newFolderLabel}
-                </Button>
-              }
-            />
-          ) : (
-            <DriveGrid
-              folders={sortedFolders}
-              files={sortedFiles}
-              view={view}
-              selectedFolder={selectedFolder}
-              selectedFile={selectedFile}
-              folderSectionLabel={folderSectionLabel}
-              newFolderLabel={newFolderLabel}
-              onSelectFolder={(folder) => {
-                setSelectedFolder(folder);
-                setSelectedFile(null);
-              }}
-              onSelectFile={(file) => {
-                setSelectedFile(file);
-                setSelectedFolder(null);
-              }}
-              onOpenFile={(file) => setPreviewFile(file)}
-              onNewFolder={() => setNewFolderOpen(true)}
-              onFolderContext={(event, folder) => {
-                event.preventDefault();
-                setMenuTarget({
-                  kind: "folder",
-                  folder,
-                  x: event.clientX,
-                  y: event.clientY,
-                });
-              }}
-              onFileContext={(event, file) => {
-                event.preventDefault();
-                setMenuTarget({
-                  kind: "file",
-                  file,
-                  x: event.clientX,
-                  y: event.clientY,
-                });
-              }}
-            />
-          )}
+          <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+            {isLoading ? (
+              <DriveSkeleton />
+            ) : sortedFolders.length === 0 && sortedFiles.length === 0 ? (
+              <div className="flex min-h-full items-center justify-center">
+                <EmptyState
+                  label={folderId ? "Drag and drop files here" : "No courses"}
+                  action={
+                    <Button onClick={() => setNewFolderOpen(true)}>
+                      {newFolderLabel}
+                    </Button>
+                  }
+                />
+              </div>
+            ) : (
+              <DriveGrid
+                folders={sortedFolders}
+                files={sortedFiles}
+                view={view}
+                selectedFolder={selectedFolder}
+                selectedFile={selectedFile}
+                folderSectionLabel={folderSectionLabel}
+                newFolderLabel={newFolderLabel}
+                onSelectFolder={(folder) => {
+                  setSelectedFolder(folder);
+                  setSelectedFile(null);
+                }}
+                onSelectFile={(file) => {
+                  setSelectedFile(file);
+                  setSelectedFolder(null);
+                }}
+                onOpenFile={(file) => setPreviewFile(file)}
+                onNewFolder={() => setNewFolderOpen(true)}
+                onFolderContext={(event, folder) => {
+                  event.preventDefault();
+                  setMenuTarget({
+                    kind: "folder",
+                    folder,
+                    x: event.clientX,
+                    y: event.clientY,
+                  });
+                }}
+                onFileContext={(event, file) => {
+                  event.preventDefault();
+                  setMenuTarget({
+                    kind: "file",
+                    file,
+                    x: event.clientX,
+                    y: event.clientY,
+                  });
+                }}
+              />
+            )}
+          </div>
         </div>
 
         <ContextMenu

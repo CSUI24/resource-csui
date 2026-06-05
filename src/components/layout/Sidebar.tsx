@@ -16,15 +16,15 @@ export function Sidebar() {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   return (
-    <aside className="hidden w-72 shrink-0 border-r border-border bg-background lg:flex lg:flex-col">
-      <div className="flex h-16 items-center border-b border-border px-6">
+    <aside className="hidden h-dvh min-h-0 w-72 shrink-0 border-r border-border bg-background lg:flex lg:flex-col">
+      <div className="flex h-16 shrink-0 items-center border-b border-border px-6">
         <Link href="/drive" className="min-w-0">
           <span className="block truncate text-base font-medium leading-5 text-foreground">
             Resource Pacil
           </span>
         </Link>
       </div>
-      <div className="flex-1 overflow-y-auto px-4 py-5">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5">
         <div className="mb-3 px-2 text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
           Courses
         </div>
@@ -80,7 +80,7 @@ export function Sidebar() {
           </nav>
         )}
       </div>
-      <div className="border-t border-border p-4">
+      <div className="shrink-0 border-t border-border p-4">
         <Button
           variant="secondary"
           className="w-full justify-start"

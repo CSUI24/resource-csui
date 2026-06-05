@@ -30,7 +30,7 @@ export function DriveInspector({ target }: { target: InspectorTarget }) {
     const folder = target.folder;
     const folderType = folder.parentId === null ? "Course" : "Folder";
     return (
-      <aside className="hidden w-72 shrink-0 border-l border-border bg-background px-5 py-8 xl:block">
+      <aside className="hidden h-full w-72 shrink-0 overflow-y-auto border-l border-border bg-background px-5 py-8 xl:block">
         <div className="flex flex-col items-center text-center">
           <div className="mb-5 flex h-24 w-24 items-center justify-center rounded-[12px] bg-[#f5e9d4]">
             <FolderClosed className="h-12 w-12 text-folder" />
@@ -57,7 +57,7 @@ export function DriveInspector({ target }: { target: InspectorTarget }) {
   const file = target.file;
 
   return (
-    <aside className="hidden w-72 shrink-0 border-l border-border bg-background px-5 py-8 xl:block">
+    <aside className="hidden h-full w-72 shrink-0 overflow-y-auto border-l border-border bg-background px-5 py-8 xl:block">
       <div className="flex flex-col items-center text-center">
         <div className="mb-5 flex h-24 w-24 items-center justify-center rounded-[12px] bg-surface-soft">
           <FileTypeIcon fileName={file.name} />

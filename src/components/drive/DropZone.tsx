@@ -24,7 +24,7 @@ export function DropZone({
 }) {
   return (
     <div
-      className="relative min-h-[calc(100dvh-64px)] min-w-0 flex-1 bg-surface-soft px-4 py-6 lg:px-8 lg:py-8"
+      className="relative h-full min-h-0 min-w-0 flex-1 overflow-hidden bg-surface-soft px-4 py-6 lg:px-8 lg:py-8"
       onContextMenu={onContextMenu}
       onDragOver={disabled ? undefined : dragHandlers.onDragOver}
       onDragLeave={disabled ? undefined : dragHandlers.onDragLeave}
