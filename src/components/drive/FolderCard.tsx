@@ -41,7 +41,12 @@ export function FolderCard({
         onContextMenu(event, folder);
       }}
     >
-      <div className={cn("flex min-w-0 items-center gap-3", isGrid ? "w-full flex-col gap-3" : "flex-1")}>
+      <div
+        className={cn(
+          "flex min-w-0 items-center gap-3",
+          isGrid ? "w-full max-w-full flex-col gap-3 px-2" : "flex-1",
+        )}
+      >
         {isGrid ? (
           <span className="relative block h-20 w-28 shrink-0">
             <span className="absolute left-1 top-2 h-4 w-11 rounded-t-[6px] bg-[#f1c982]" />
@@ -54,12 +59,27 @@ export function FolderCard({
             <FolderClosed className="h-5 w-5 text-folder" />
           </span>
         )}
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-sm font-medium">{folder.name}</div>
-          {!isGrid && <div className="text-xs text-muted-foreground">{folder.itemCount} items</div>}
+        <div
+          className={cn(
+            "min-w-0",
+            isGrid ? "w-full max-w-full px-1" : "flex-1",
+          )}
+        >
+          <div className="block w-full truncate text-sm font-medium">
+            {folder.name}
+          </div>
+          {!isGrid && (
+            <div className="truncate text-xs text-muted-foreground">
+              {folder.itemCount} items
+            </div>
+          )}
         </div>
       </div>
-      {isGrid && <div className="truncate text-xs text-muted-foreground">{folder.itemCount} items</div>}
+      {isGrid && (
+        <div className="w-full max-w-full truncate px-3 text-xs text-muted-foreground">
+          {folder.itemCount} items
+        </div>
+      )}
       {!isGrid && (
         <div className="ml-4 hidden shrink-0 text-right text-xs text-muted-foreground sm:block">
           <div>{typeLabel}</div>

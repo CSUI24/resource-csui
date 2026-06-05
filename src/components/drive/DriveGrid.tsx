@@ -23,6 +23,7 @@ export function DriveGrid({
   newFolderLabel,
   onSelectFolder,
   onSelectFile,
+  onOpenFile,
   onNewFolder,
   onFolderContext,
   onFileContext,
@@ -36,6 +37,7 @@ export function DriveGrid({
   newFolderLabel: string;
   onSelectFolder: (folder: Folder) => void;
   onSelectFile: (file: ResourceFile) => void;
+  onOpenFile: (file: ResourceFile) => void;
   onNewFolder: () => void;
   onFolderContext: (event: React.MouseEvent, folder: Folder) => void;
   onFileContext: (event: React.MouseEvent, file: ResourceFile) => void;
@@ -69,7 +71,7 @@ export function DriveGrid({
         <div
           className={
             view === "grid"
-              ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
+              ? "grid grid-cols-2 gap-4 lg:grid-cols-4"
               : "divide-y divide-border rounded-[10px] border border-border bg-background p-1"
           }
         >
@@ -88,7 +90,7 @@ export function DriveGrid({
             type="button"
             className={
               view === "grid"
-                ? "drive-item flex h-40 min-w-0 flex-col items-center justify-center gap-3 rounded-[10px] text-sm font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                ? "drive-item flex h-40 min-w-0 flex-col items-center justify-center gap-3 rounded-[10px] px-2 text-sm font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 : "drive-item flex h-16 min-w-0 items-center gap-3 rounded-[6px] border border-transparent bg-background px-3 text-sm font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
             }
             onClick={onNewFolder}
@@ -120,7 +122,7 @@ export function DriveGrid({
           <div
             className={
               view === "grid"
-                ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
+                ? "grid grid-cols-2 gap-4 lg:grid-cols-4"
                 : "divide-y divide-border rounded-[10px] border border-border bg-background p-1"
             }
           >
@@ -131,6 +133,7 @@ export function DriveGrid({
                   view={view}
                   selected={selectedFile?.id === file.id}
                   onSelect={onSelectFile}
+                  onOpen={onOpenFile}
                   onContextMenu={onFileContext}
                 />
               </div>

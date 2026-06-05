@@ -8,7 +8,7 @@ import { DEV_SESSION_COOKIE, SESSION_COOKIE } from "../constants";
 import { isDevAuthEnabled } from "../env";
 import { prisma } from "../prisma";
 
-const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
+const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 const EXPIRED_COOKIE_DATE = "Thu, 01 Jan 1970 00:00:00 GMT";
 
 const devUser: SessionUser = {

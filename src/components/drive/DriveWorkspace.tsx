@@ -200,8 +200,8 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
               onSelectFile={(file) => {
                 setSelectedFile(file);
                 setSelectedFolder(null);
-                setPreviewFile(file);
               }}
+              onOpenFile={(file) => setPreviewFile(file)}
               onNewFolder={() => setNewFolderOpen(true)}
               onFolderContext={(event, folder) => {
                 event.preventDefault();

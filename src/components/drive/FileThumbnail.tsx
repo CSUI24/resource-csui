@@ -1,6 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import {
   FileArchive,
   FileImage,
@@ -11,11 +10,6 @@ import {
 
 import { cn, getExtension, getFileTypeLabel, isImageFile, isPdfFile } from "@/lib/utils";
 import type { ResourceFile } from "@/types/file";
-
-const PdfThumbnailPreview = dynamic(
-  () => import("./PdfThumbnail").then((module) => module.PdfThumbnail),
-  { ssr: false },
-);
 
 export function FileThumbnail({
   file,
@@ -46,7 +40,7 @@ export function FileThumbnail({
   }
 
   if (isPdfFile(file.name, file.mimeType)) {
-    return <PdfThumbnailPreview file={file} previewUrl={previewUrl} view={view} />;
+    return <ThumbnailFallback file={file} view={view} />;
   }
 
   return <ThumbnailFallback file={file} view={view} />;

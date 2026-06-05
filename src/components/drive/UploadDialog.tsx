@@ -15,6 +15,7 @@ import { Button } from "../ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -172,218 +173,226 @@ export function UploadDialog({
       open={open}
       onOpenChange={(nextOpen) => !uploading && onOpenChange(nextOpen)}
     >
-      <DialogContent className="max-w-3xl gap-5">
-        <DialogHeader>
+      <DialogContent className="grid max-h-[calc(100dvh-16px)] w-[calc(100vw-16px)] max-w-3xl grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden p-0 sm:max-h-[calc(100dvh-32px)] sm:w-[calc(100vw-32px)]">
+        <DialogHeader className="border-b border-border px-4 py-4 pr-12 sm:px-6">
           <DialogTitle>Upload files</DialogTitle>
+          <DialogDescription className="sr-only">
+            Select files, add optional metadata, and upload them to this folder.
+          </DialogDescription>
         </DialogHeader>
 
-        <input
-          ref={fileInputRef}
-          className="hidden"
-          type="file"
-          multiple
-          accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip"
-          onChange={(event) => {
-            addFiles(Array.from(event.target.files ?? []));
-            event.currentTarget.value = "";
-          }}
-        />
+        <div className="min-h-0 space-y-4 overflow-y-auto px-4 py-4 sm:space-y-5 sm:px-6">
+          <input
+            ref={fileInputRef}
+            className="hidden"
+            type="file"
+            multiple
+            accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.zip"
+            onChange={(event) => {
+              addFiles(Array.from(event.target.files ?? []));
+              event.currentTarget.value = "";
+            }}
+          />
 
-        <div
-          className={cn(
-            "rounded-[12px] border border-dashed border-border bg-surface-soft px-5 py-4",
-            isModalDragging && "border-ring bg-background",
-          )}
-          onDragOver={(event) => {
-            event.preventDefault();
-            setIsModalDragging(true);
-          }}
-          onDragLeave={(event) => {
-            if (event.currentTarget === event.target) setIsModalDragging(false);
-          }}
-          onDrop={handleDrop}
-        >
-          <div className="flex items-center gap-4">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[10px] bg-background">
-              <FileUp className="h-5 w-5 text-foreground" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <div className="text-sm font-medium text-foreground">
-                {rows.length > 0
-                  ? `${rows.length} file${rows.length > 1 ? "s" : ""} ready`
-                  : "Drop files here"}
+          <div
+            className={cn(
+              "rounded-[12px] border border-dashed border-border bg-surface-soft px-4 py-4 sm:px-5",
+              isModalDragging && "border-ring bg-background",
+            )}
+            onDragOver={(event) => {
+              event.preventDefault();
+              setIsModalDragging(true);
+            }}
+            onDragLeave={(event) => {
+              if (event.currentTarget === event.target)
+                setIsModalDragging(false);
+            }}
+            onDrop={handleDrop}
+          >
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[10px] bg-background">
+                <FileUp className="h-5 w-5 text-foreground" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-medium text-foreground">
+                  {rows.length > 0
+                    ? `${rows.length} file${rows.length > 1 ? "s" : ""} ready`
+                    : "Drop files here"}
+                </div>
+                <div className="mt-1 text-xs text-muted-foreground">
+                  PDF, Office files, images, and ZIP. Max 50 MB each.
+                </div>
               </div>
-              <div className="mt-1 text-xs text-muted-foreground">
-                PDF, Office files, images, and ZIP. Max 50 MB each.
-              </div>
-            </div>
-            <Button
-              variant="secondary"
-              disabled={uploading}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              Choose files
-            </Button>
-          </div>
-        </div>
-
-        <div className="grid gap-3 rounded-[10px] border border-border bg-background p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
-          <div className="min-w-0">
-            <div className="text-sm font-medium text-foreground">
-              Contributor display
-            </div>
-            <div className="mt-1 truncate text-xs text-muted-foreground">
-              Shown as{" "}
-              {getContributorPreview(
-                session.data?.user?.name ??
-                  session.data?.user?.username ??
-                  "Student",
-                contributorVisibility,
-              )}
-            </div>
-          </div>
-          <div className="inline-flex rounded-full border border-border bg-surface-soft p-0.5">
-            <button
-              type="button"
-              className={cn(
-                "h-9 rounded-full px-3 text-xs font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                contributorVisibility === "initials" &&
-                  "bg-background text-foreground",
-              )}
-              onClick={() => setContributorVisibility("initials")}
-            >
-              Initials
-            </button>
-            <button
-              type="button"
-              className={cn(
-                "h-9 rounded-full px-3 text-xs font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                contributorVisibility === "full" &&
-                  "bg-background text-foreground",
-              )}
-              onClick={() => setContributorVisibility("full")}
-            >
-              Full name
-            </button>
-          </div>
-        </div>
-
-        <div className="max-h-[65vh] space-y-3 overflow-y-auto pr-1">
-          {rows.length === 0 ? (
-            <div
-              className="flex min-h-44 flex-col items-center justify-center rounded-[10px] border border-border bg-background text-center text-sm text-muted-foreground"
-              onDragOver={(event) => {
-                event.preventDefault();
-                setIsModalDragging(true);
-              }}
-              onDrop={handleDrop}
-            >
-              <FileUp className="mb-3 h-6 w-6 text-muted-foreground" />
-              <div>No files selected</div>
-              <button
-                type="button"
-                className="mt-2 text-xs font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              <Button
+                className="w-full sm:w-auto"
+                variant="secondary"
+                disabled={uploading}
                 onClick={() => fileInputRef.current?.click()}
               >
                 Choose files
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid gap-3 rounded-[10px] border border-border bg-background p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+            <div className="min-w-0">
+              <div className="text-sm font-medium text-foreground">
+                Contributor display
+              </div>
+              <div className="mt-1 truncate text-xs text-muted-foreground">
+                Shown as{" "}
+                {getContributorPreview(
+                  session.data?.user?.name ??
+                    session.data?.user?.username ??
+                    "Student",
+                  contributorVisibility,
+                )}
+              </div>
+            </div>
+            <div className="inline-flex w-full rounded-full border border-border bg-surface-soft p-0.5 sm:w-auto">
+              <button
+                type="button"
+                className={cn(
+                  "h-9 flex-1 rounded-full px-3 text-xs font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex-none",
+                  contributorVisibility === "initials" &&
+                    "bg-background text-foreground",
+                )}
+                onClick={() => setContributorVisibility("initials")}
+              >
+                Initials
+              </button>
+              <button
+                type="button"
+                className={cn(
+                  "h-9 flex-1 rounded-full px-3 text-xs font-medium text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex-none",
+                  contributorVisibility === "full" &&
+                    "bg-background text-foreground",
+                )}
+                onClick={() => setContributorVisibility("full")}
+              >
+                Full name
               </button>
             </div>
-          ) : (
-            rows.map((row) => {
-              const rowInvalid =
-                !isAcceptedFileName(row.file.name) ||
-                row.file.size > MAX_FILE_SIZE_BYTES;
-              return (
-                <div
-                  key={row.id}
-                  className={cn(
-                    "rounded-[10px] border border-border bg-background p-4",
-                    row.status === "error" && "border-destructive",
-                  )}
+          </div>
+
+          <div className="space-y-3">
+            {rows.length === 0 ? (
+              <div
+                className="flex min-h-44 flex-col items-center justify-center rounded-[10px] border border-border bg-background text-center text-sm text-muted-foreground"
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  setIsModalDragging(true);
+                }}
+                onDrop={handleDrop}
+              >
+                <FileUp className="mb-3 h-6 w-6 text-muted-foreground" />
+                <div>No files selected</div>
+                <button
+                  type="button"
+                  className="mt-2 text-xs font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  onClick={() => fileInputRef.current?.click()}
                 >
-                  <div className="flex items-start gap-3">
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] bg-surface-soft">
-                      <Upload className="h-5 w-5 text-muted-foreground" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex min-w-0 items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="truncate text-sm font-medium text-foreground">
-                            {row.file.name}
+                  Choose files
+                </button>
+              </div>
+            ) : (
+              rows.map((row) => {
+                const rowInvalid =
+                  !isAcceptedFileName(row.file.name) ||
+                  row.file.size > MAX_FILE_SIZE_BYTES;
+                return (
+                  <div
+                    key={row.id}
+                    className={cn(
+                      "rounded-[10px] border border-border bg-background p-4",
+                      row.status === "error" && "border-destructive",
+                    )}
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] bg-surface-soft">
+                        <Upload className="h-5 w-5 text-muted-foreground" />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex min-w-0 items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="truncate text-sm font-medium text-foreground">
+                              {row.file.name}
+                            </div>
+                            <div className="mt-1 text-xs text-muted-foreground">
+                              {formatBytes(row.file.size)}
+                            </div>
                           </div>
-                          <div className="mt-1 text-xs text-muted-foreground">
-                            {formatBytes(row.file.size)}
-                          </div>
+                          <UploadStatusBadge
+                            status={rowInvalid ? "error" : row.status}
+                          />
                         </div>
-                        <UploadStatusBadge
-                          status={rowInvalid ? "error" : row.status}
+                        <Progress className="mt-3 h-1.5" value={row.progress} />
+                      </div>
+                    </div>
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      <div className="space-y-2 sm:col-span-2">
+                        <Label>Description</Label>
+                        <Textarea
+                          value={row.metadata.description ?? ""}
+                          onChange={(event) =>
+                            patchMetadata(row.id, {
+                              description: event.target.value,
+                            })
+                          }
+                          placeholder="Optional"
                         />
                       </div>
-                      <Progress className="mt-3 h-1.5" value={row.progress} />
+                      <div className="space-y-2">
+                        <Label>Week</Label>
+                        <Input
+                          type="number"
+                          min={1}
+                          value={row.metadata.week ?? ""}
+                          placeholder="Optional"
+                          onChange={(event) =>
+                            patchMetadata(row.id, {
+                              week: event.target.value
+                                ? Number(event.target.value)
+                                : undefined,
+                            })
+                          }
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Lecturer</Label>
+                        <Input
+                          value={row.metadata.lecturer ?? ""}
+                          onChange={(event) =>
+                            patchMetadata(row.id, {
+                              lecturer: event.target.value,
+                            })
+                          }
+                          placeholder="Optional"
+                        />
+                      </div>
+                      <div className="space-y-2 sm:col-span-2">
+                        <Label>Tags</Label>
+                        <Input
+                          value={row.metadata.tagsText ?? ""}
+                          onChange={(event) =>
+                            patchMetadata(row.id, {
+                              tagsText: event.target.value,
+                            })
+                          }
+                          placeholder="Comma separated (Optional)"
+                        />
+                      </div>
                     </div>
                   </div>
-
-                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                    <div className="space-y-2 sm:col-span-2">
-                      <Label>Description</Label>
-                      <Textarea
-                        value={row.metadata.description ?? ""}
-                        onChange={(event) =>
-                          patchMetadata(row.id, {
-                            description: event.target.value,
-                          })
-                        }
-                        placeholder="Optional"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Week</Label>
-                      <Input
-                        type="number"
-                        min={1}
-                        value={row.metadata.week ?? ""}
-                        placeholder="Optional"
-                        onChange={(event) =>
-                          patchMetadata(row.id, {
-                            week: event.target.value
-                              ? Number(event.target.value)
-                              : undefined,
-                          })
-                        }
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Lecturer</Label>
-                      <Input
-                        value={row.metadata.lecturer ?? ""}
-                        onChange={(event) =>
-                          patchMetadata(row.id, {
-                            lecturer: event.target.value,
-                          })
-                        }
-                        placeholder="Optional"
-                      />
-                    </div>
-                    <div className="space-y-2 sm:col-span-2">
-                      <Label>Tags</Label>
-                      <Input
-                        value={row.metadata.tagsText ?? ""}
-                        onChange={(event) =>
-                          patchMetadata(row.id, {
-                            tagsText: event.target.value,
-                          })
-                        }
-                        placeholder="Comma separated (Optional)"
-                      />
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          )}
+                );
+              })
+            )}
+          </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="flex-col-reverse border-t border-border px-4 py-4 sm:flex-row sm:px-6">
           <Button
+            className="w-full sm:w-auto"
             variant="secondary"
             disabled={uploading}
             onClick={() => onOpenChange(false)}
@@ -391,6 +400,7 @@ export function UploadDialog({
             Close
           </Button>
           <Button
+            className="w-full sm:w-auto"
             disabled={uploading || rows.length === 0 || invalid}
             onClick={uploadAll}
           >

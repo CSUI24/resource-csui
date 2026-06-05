@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -26,14 +27,6 @@ type OfficeViewerProps = {
   url: string;
   fileName: string;
 };
-
-const PdfViewer = dynamic(
-  () => import("./PdfViewer").then((module) => module.PdfViewer),
-  {
-    ssr: false,
-    loading: () => <PreviewSkeleton />,
-  },
-);
 
 const OfficeViewer = dynamic<OfficeViewerProps>(
   async () => {
@@ -86,6 +79,9 @@ export function FilePreviewDialog({
                 <DialogTitle className="truncate text-base">
                   {file.name}
                 </DialogTitle>
+                <DialogDescription className="sr-only">
+                  File preview and download actions for {file.name}.
+                </DialogDescription>
                 <div className="mt-1 truncate text-xs text-muted-foreground">
                   {getFileTypeLabel(file.name)} · {formatBytes(file.sizeBytes)} · {file.ownerLabel}
                 </div>
@@ -139,7 +135,7 @@ function PreviewSurface({
   }
 
   if (isPdfFile(file.name, file.mimeType)) {
-    return <PdfViewer fileName={file.name} previewUrl={previewUrl} />;
+    return <PdfBrowserPreview fileName={file.name} previewUrl={previewUrl} />;
   }
 
   if (isPresentationFile(file.name, file.mimeType)) {
@@ -147,6 +143,24 @@ function PreviewSurface({
   }
 
   return <UnsupportedPreview fileName={file.name} />;
+}
+
+function PdfBrowserPreview({
+  fileName,
+  previewUrl,
+}: {
+  fileName: string;
+  previewUrl: string;
+}) {
+  return (
+    <div className="h-full bg-background p-3">
+      <iframe
+        title={fileName}
+        src={previewUrl}
+        className="h-full w-full rounded-[10px] border border-border bg-background"
+      />
+    </div>
+  );
 }
 
 function OfficePreview({ file }: { file: ResourceFile }) {

@@ -24,23 +24,7 @@ type InspectorTarget =
   | null;
 
 export function DriveInspector({ target }: { target: InspectorTarget }) {
-  if (!target) {
-    return (
-      <aside className="hidden w-72 shrink-0 border-l border-border bg-background px-5 py-8 xl:block">
-        <div className="flex h-full flex-col items-center justify-center text-center">
-          <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-[12px] bg-surface-soft">
-            <FolderClosed className="h-9 w-9 text-folder" />
-          </div>
-          <div className="text-sm font-medium text-foreground">
-            Select an item
-          </div>
-          <div className="mt-1 text-xs text-muted-foreground">
-            Details appear here
-          </div>
-        </div>
-      </aside>
-    );
-  }
+  if (!target) return null;
 
   if (target.kind === "folder") {
     const folder = target.folder;

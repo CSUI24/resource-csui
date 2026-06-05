@@ -9,12 +9,14 @@ export function FileCard({
   selected,
   view,
   onSelect,
+  onOpen,
   onContextMenu,
 }: {
   file: ResourceFile;
   selected: boolean;
   view: "grid" | "list";
   onSelect: (file: ResourceFile) => void;
+  onOpen: (file: ResourceFile) => void;
   onContextMenu: (event: React.MouseEvent, file: ResourceFile) => void;
 }) {
   const isGrid = view === "grid";
@@ -30,7 +32,7 @@ export function FileCard({
         selected && (isGrid ? "border-ring" : "bg-surface-soft"),
       )}
       onClick={() => onSelect(file)}
-      onDoubleClick={() => onSelect(file)}
+      onDoubleClick={() => onOpen(file)}
       onContextMenu={(event) => {
         event.stopPropagation();
         onContextMenu(event, file);

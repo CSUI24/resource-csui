@@ -5,10 +5,8 @@ import type { NextConfig } from "next";
 const root = dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
+  outputFileTracingRoot: root,
   reactCompiler: true,
-  turbopack: {
-    root,
-  },
 };
 
 export default nextConfig;

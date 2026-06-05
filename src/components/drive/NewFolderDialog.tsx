@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -39,6 +40,9 @@ export function NewFolderDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>New {label}</DialogTitle>
+          <DialogDescription className="sr-only">
+            Create a new {label.toLowerCase()} in the current workspace.
+          </DialogDescription>
         </DialogHeader>
         <form
           className="space-y-4"
