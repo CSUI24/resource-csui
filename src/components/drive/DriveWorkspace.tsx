@@ -285,6 +285,14 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
             setSelectedFolder(null);
             setPreviewFile(file);
           }}
+          onShowFolderDetails={(folder) => {
+            setSelectedFolder(folder);
+            setSelectedFile(null);
+          }}
+          onShowFileDetails={(file) => {
+            setSelectedFile(file);
+            setSelectedFolder(null);
+          }}
         />
       </DropZone>
       <DriveInspector
