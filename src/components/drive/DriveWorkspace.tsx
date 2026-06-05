@@ -116,7 +116,7 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
       : null;
 
   return (
-    <div className="flex h-[calc(100dvh-64px)] min-h-0 min-w-0 overflow-hidden">
+    <div className="relative flex h-[calc(100dvh-64px)] min-h-0 min-w-0 overflow-hidden">
       <DropZone
         isDragging={drag.isDragging}
         dragHandlers={drag}
