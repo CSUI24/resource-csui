@@ -1,20 +1,25 @@
 "use client";
 
-import { ChevronDown, LogOut, Menu } from "lucide-react";
+import { ChevronDown, FolderClosed, Menu, Plus } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
 
+import { SidebarSkeleton } from "@/components/shared/LoadingSkeletons";
 import { SearchBar } from "@/components/shared/SearchBar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useFolders } from "@/lib/hooks/useFolders";
 import { useSession } from "@/lib/hooks/useSession";
 import { cn } from "@/lib/utils";
@@ -73,25 +78,64 @@ export function Topbar() {
         </DropdownMenu>
       </div>
       <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-        <SheetContent className="left-0 right-auto w-80 border-l-0 border-r">
-          <SheetHeader>
+        <SheetContent className="left-0 right-auto flex w-[calc(100vw-24px)] max-w-80 flex-col border-l-0 border-r p-0">
+          <SheetHeader className="border-b border-border px-5 py-4 pr-12">
             <SheetTitle>Resource CSUI</SheetTitle>
+            <SheetDescription className="sr-only">
+              Mobile navigation for courses and folders.
+            </SheetDescription>
           </SheetHeader>
-          <nav className="mt-6 space-y-1.5">
-            {(courses.data?.folders ?? []).map((folder) => (
-              <Link
-                key={folder.id}
-                href={`/drive/${folder.id}`}
-                className={cn(
-                  "block rounded-[10px] border border-transparent px-3 py-2 text-sm text-muted-foreground",
-                  pathname === `/drive/${folder.id}` && "border-border bg-surface-soft text-foreground",
-                )}
-                onClick={() => setMenuOpen(false)}
-              >
-                {folder.name}
-              </Link>
-            ))}
-          </nav>
+          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5">
+            <div className="mb-3 px-2 text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
+              Courses
+            </div>
+            {courses.isLoading ? (
+              <SidebarSkeleton />
+            ) : (
+              <nav className="space-y-1.5">
+                {(courses.data?.folders ?? []).map((folder) => {
+                  const active = pathname === `/drive/${folder.id}`;
+                  return (
+                    <Link
+                      key={folder.id}
+                      href={`/drive/${folder.id}`}
+                      className={cn(
+                        "flex min-h-14 min-w-0 items-center gap-3 rounded-[10px] border border-transparent px-3 py-2 text-muted-foreground",
+                        active &&
+                          "border-border bg-surface-soft text-foreground",
+                      )}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-surface-soft">
+                        <FolderClosed className="h-5 w-5 text-folder" />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-medium">
+                          {folder.name}
+                        </span>
+                        <span className="mt-0.5 block truncate text-xs text-muted-foreground">
+                          Course · {folder.itemCount} items
+                        </span>
+                      </span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            )}
+          </div>
+          <div className="border-t border-border p-4">
+            <Button
+              variant="secondary"
+              className="w-full justify-start"
+              onClick={() => {
+                setMenuOpen(false);
+                window.dispatchEvent(new CustomEvent("resource:new-folder"));
+              }}
+            >
+              <Plus className="h-4 w-4" />
+              New Course
+            </Button>
+          </div>
         </SheetContent>
       </Sheet>
     </header>

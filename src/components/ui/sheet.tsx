@@ -38,3 +38,10 @@ export function SheetHeader({ className, ...props }: ComponentPropsWithoutRef<"d
 export function SheetTitle({ className, ...props }: ComponentPropsWithoutRef<typeof DialogPrimitive.Title>) {
   return <DialogPrimitive.Title className={cn("text-lg font-medium leading-6 text-foreground", className)} {...props} />;
 }
+
+export function SheetDescription({
+  className,
+  ...props
+}: ComponentPropsWithoutRef<typeof DialogPrimitive.Description>) {
+  return <DialogPrimitive.Description className={cn("text-sm text-muted-foreground", className)} {...props} />;
+}
