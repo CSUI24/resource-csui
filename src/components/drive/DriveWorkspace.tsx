@@ -44,6 +44,7 @@ import { FilePreviewDialog } from "./FilePreviewDialog";
 import { NewFolderDialog } from "./NewFolderDialog";
 import { RenameDialog } from "./RenameDialog";
 import { UploadDialog } from "./UploadDialog";
+import { UploadDropCard } from "./UploadDropCard";
 
 type SortMode = "name" | "date";
 
@@ -115,6 +116,19 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
       ? { kind: "file" as const, file: selectedFile }
       : null;
 
+  useEffect(() => {
+    if (!selectedFile && !selectedFolder) return;
+
+    const closeInspector = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.defaultPrevented) return;
+      setSelectedFile(null);
+      setSelectedFolder(null);
+    };
+
+    window.addEventListener("keydown", closeInspector);
+    return () => window.removeEventListener("keydown", closeInspector);
+  }, [selectedFile, selectedFolder]);
+
   return (
     <div className="relative flex h-[calc(100dvh-64px)] min-h-0 min-w-0 overflow-hidden">
       <DropZone
@@ -179,16 +193,32 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
             {isLoading ? (
               <DriveSkeleton />
             ) : sortedFolders.length === 0 && sortedFiles.length === 0 ? (
-              <div className="flex min-h-full items-center justify-center">
-                <EmptyState
-                  label={folderId ? "Drag and drop files here" : "No courses"}
-                  action={
-                    <Button onClick={() => setNewFolderOpen(true)}>
-                      {newFolderLabel}
-                    </Button>
-                  }
-                />
-              </div>
+              folderId ? (
+                <div className="flex min-h-full items-center justify-center">
+                  <div className="w-full max-w-3xl">
+                    <UploadDropCard
+                      disabled={isRoot}
+                      isDragging={drag.isDragging}
+                      onBrowse={() => {
+                        setUploadFiles([]);
+                        setUploadNonce((value) => value + 1);
+                        setUploadOpen(true);
+                      }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="flex min-h-full items-center justify-center">
+                  <EmptyState
+                    label="No courses"
+                    action={
+                      <Button onClick={() => setNewFolderOpen(true)}>
+                        {newFolderLabel}
+                      </Button>
+                    }
+                  />
+                </div>
+              )
             ) : (
               <DriveGrid
                 folders={sortedFolders}
@@ -257,7 +287,13 @@ export function DriveWorkspace({ folderId }: { folderId: string | null }) {
           }}
         />
       </DropZone>
-      <DriveInspector target={selectedTarget} />
+      <DriveInspector
+        target={selectedTarget}
+        onClose={() => {
+          setSelectedFile(null);
+          setSelectedFolder(null);
+        }}
+      />
 
       <NewFolderDialog
         open={newFolderOpen}

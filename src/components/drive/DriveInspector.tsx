@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  X,
   FileArchive,
   FileImage,
   FileSpreadsheet,
@@ -23,7 +24,13 @@ type InspectorTarget =
   | { kind: "file"; file: ResourceFile }
   | null;
 
-export function DriveInspector({ target }: { target: InspectorTarget }) {
+export function DriveInspector({
+  target,
+  onClose,
+}: {
+  target: InspectorTarget;
+  onClose: () => void;
+}) {
   if (!target) return null;
 
   if (target.kind === "folder") {
@@ -31,6 +38,7 @@ export function DriveInspector({ target }: { target: InspectorTarget }) {
     const folderType = folder.parentId === null ? "Course" : "Folder";
     return (
       <aside className="absolute inset-y-0 right-0 z-20 hidden w-72 overflow-y-auto border-l border-border bg-background px-5 py-8 xl:block">
+        <CloseButton onClose={onClose} />
         <div className="flex flex-col items-center text-center">
           <div className="mb-5 flex h-24 w-24 items-center justify-center rounded-[12px] bg-[#f5e9d4]">
             <FolderClosed className="h-12 w-12 text-folder" />
@@ -58,6 +66,7 @@ export function DriveInspector({ target }: { target: InspectorTarget }) {
 
   return (
     <aside className="absolute inset-y-0 right-0 z-20 hidden w-72 overflow-y-auto border-l border-border bg-background px-5 py-8 xl:block">
+      <CloseButton onClose={onClose} />
       <div className="flex flex-col items-center text-center">
         <div className="mb-5 flex h-24 w-24 items-center justify-center rounded-[12px] bg-surface-soft">
           <FileTypeIcon fileName={file.name} />
@@ -80,6 +89,19 @@ export function DriveInspector({ target }: { target: InspectorTarget }) {
         ]}
       />
     </aside>
+  );
+}
+
+function CloseButton({ onClose }: { onClose: () => void }) {
+  return (
+    <button
+      type="button"
+      className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      aria-label="Close details"
+      onClick={onClose}
+    >
+      <X className="h-4 w-4" />
+    </button>
   );
 }
 

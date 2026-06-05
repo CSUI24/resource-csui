@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, FileUp, Upload, XCircle } from "lucide-react";
+import { CheckCircle2, ChevronDown, Upload, XCircle } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -11,6 +11,7 @@ import { cn, formatBytes, isAcceptedFileName } from "@/lib/utils";
 import { useSession } from "@/lib/hooks/useSession";
 import type { ResourceFileMetadata } from "@/types/file";
 
+import { UploadDropCard } from "./UploadDropCard";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -50,6 +51,9 @@ export function UploadDialog({
   const [rows, setRows] = useState<UploadRow[]>(() => createRows(initialFiles));
   const [uploading, setUploading] = useState(false);
   const [isModalDragging, setIsModalDragging] = useState(false);
+  const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>(
+    {},
+  );
   const [contributorVisibility, setContributorVisibility] =
     useState<NonNullable<ResourceFileMetadata["contributorVisibility"]>>(
       "initials",
@@ -157,6 +161,10 @@ export function UploadDialog({
     );
   }
 
+  function toggleRow(id: string) {
+    setExpandedRows((current) => ({ ...current, [id]: !current[id] }));
+  }
+
   function addFiles(files: File[]) {
     if (files.length === 0) return;
     setRows((current) => [...current, ...createRows(files, current.length)]);
@@ -194,11 +202,14 @@ export function UploadDialog({
             }}
           />
 
-          <div
-            className={cn(
-              "rounded-[12px] border border-dashed border-border bg-surface-soft px-4 py-4 sm:px-5",
-              isModalDragging && "border-ring bg-background",
-            )}
+          <div className="text-base font-medium text-muted-foreground">
+            Add your files or documents here
+          </div>
+          <UploadDropCard
+            filesCount={rows.length}
+            isDragging={isModalDragging}
+            disabled={uploading}
+            onBrowse={() => fileInputRef.current?.click()}
             onDragOver={(event) => {
               event.preventDefault();
               setIsModalDragging(true);
@@ -208,31 +219,7 @@ export function UploadDialog({
                 setIsModalDragging(false);
             }}
             onDrop={handleDrop}
-          >
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[10px] bg-background">
-                <FileUp className="h-5 w-5 text-foreground" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-medium text-foreground">
-                  {rows.length > 0
-                    ? `${rows.length} file${rows.length > 1 ? "s" : ""} ready`
-                    : "Drop files here"}
-                </div>
-                <div className="mt-1 text-xs text-muted-foreground">
-                  PDF, Office files, images, and ZIP. Max 50 MB each.
-                </div>
-              </div>
-              <Button
-                className="w-full sm:w-auto"
-                variant="secondary"
-                disabled={uploading}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                Choose files
-              </Button>
-            </div>
-          </div>
+          />
 
           <div className="grid gap-3 rounded-[10px] border border-border bg-background p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
             <div className="min-w-0">
@@ -277,29 +264,15 @@ export function UploadDialog({
 
           <div className="space-y-3">
             {rows.length === 0 ? (
-              <div
-                className="flex min-h-44 flex-col items-center justify-center rounded-[10px] border border-border bg-background text-center text-sm text-muted-foreground"
-                onDragOver={(event) => {
-                  event.preventDefault();
-                  setIsModalDragging(true);
-                }}
-                onDrop={handleDrop}
-              >
-                <FileUp className="mb-3 h-6 w-6 text-muted-foreground" />
-                <div>No files selected</div>
-                <button
-                  type="button"
-                  className="mt-2 text-xs font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  Choose files
-                </button>
+              <div className="rounded-[10px] border border-border bg-background px-4 py-5 text-center text-sm text-muted-foreground">
+                No files selected
               </div>
             ) : (
               rows.map((row) => {
                 const rowInvalid =
                   !isAcceptedFileName(row.file.name) ||
                   row.file.size > MAX_FILE_SIZE_BYTES;
+                const expanded = expandedRows[row.id] ?? false;
                 return (
                   <div
                     key={row.id}
@@ -308,7 +281,12 @@ export function UploadDialog({
                       row.status === "error" && "border-destructive",
                     )}
                   >
-                    <div className="flex items-start gap-3">
+                    <button
+                      type="button"
+                      className="flex w-full min-w-0 items-start gap-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      onClick={() => toggleRow(row.id)}
+                      aria-expanded={expanded}
+                    >
                       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] bg-surface-soft">
                         <Upload className="h-5 w-5 text-muted-foreground" />
                       </span>
@@ -322,68 +300,78 @@ export function UploadDialog({
                               {formatBytes(row.file.size)}
                             </div>
                           </div>
-                          <UploadStatusBadge
-                            status={rowInvalid ? "error" : row.status}
-                          />
+                          <div className="flex shrink-0 items-center gap-2">
+                            <UploadStatusBadge
+                              status={rowInvalid ? "error" : row.status}
+                            />
+                            <ChevronDown
+                              className={cn(
+                                "h-4 w-4 text-muted-foreground transition-transform",
+                                expanded && "rotate-180",
+                              )}
+                            />
+                          </div>
                         </div>
                         <Progress className="mt-3 h-1.5" value={row.progress} />
                       </div>
-                    </div>
+                    </button>
 
-                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                      <div className="space-y-2 sm:col-span-2">
-                        <Label>Description</Label>
-                        <Textarea
-                          value={row.metadata.description ?? ""}
-                          onChange={(event) =>
-                            patchMetadata(row.id, {
-                              description: event.target.value,
-                            })
-                          }
-                          placeholder="Optional"
-                        />
+                    {expanded && (
+                      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                        <div className="space-y-2 sm:col-span-2">
+                          <Label>Description</Label>
+                          <Textarea
+                            value={row.metadata.description ?? ""}
+                            onChange={(event) =>
+                              patchMetadata(row.id, {
+                                description: event.target.value,
+                              })
+                            }
+                            placeholder="Optional"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Week</Label>
+                          <Input
+                            type="number"
+                            min={1}
+                            value={row.metadata.week ?? ""}
+                            placeholder="Optional"
+                            onChange={(event) =>
+                              patchMetadata(row.id, {
+                                week: event.target.value
+                                  ? Number(event.target.value)
+                                  : undefined,
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Lecturer</Label>
+                          <Input
+                            value={row.metadata.lecturer ?? ""}
+                            onChange={(event) =>
+                              patchMetadata(row.id, {
+                                lecturer: event.target.value,
+                              })
+                            }
+                            placeholder="Optional"
+                          />
+                        </div>
+                        <div className="space-y-2 sm:col-span-2">
+                          <Label>Tags</Label>
+                          <Input
+                            value={row.metadata.tagsText ?? ""}
+                            onChange={(event) =>
+                              patchMetadata(row.id, {
+                                tagsText: event.target.value,
+                              })
+                            }
+                            placeholder="Comma separated (Optional)"
+                          />
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        <Label>Week</Label>
-                        <Input
-                          type="number"
-                          min={1}
-                          value={row.metadata.week ?? ""}
-                          placeholder="Optional"
-                          onChange={(event) =>
-                            patchMetadata(row.id, {
-                              week: event.target.value
-                                ? Number(event.target.value)
-                                : undefined,
-                            })
-                          }
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Lecturer</Label>
-                        <Input
-                          value={row.metadata.lecturer ?? ""}
-                          onChange={(event) =>
-                            patchMetadata(row.id, {
-                              lecturer: event.target.value,
-                            })
-                          }
-                          placeholder="Optional"
-                        />
-                      </div>
-                      <div className="space-y-2 sm:col-span-2">
-                        <Label>Tags</Label>
-                        <Input
-                          value={row.metadata.tagsText ?? ""}
-                          onChange={(event) =>
-                            patchMetadata(row.id, {
-                              tagsText: event.target.value,
-                            })
-                          }
-                          placeholder="Comma separated (Optional)"
-                        />
-                      </div>
-                    </div>
+                    )}
                   </div>
                 );
               })

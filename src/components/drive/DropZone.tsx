@@ -3,7 +3,8 @@
 import type { ReactNode } from "react";
 import { Upload } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { MAX_FILE_SIZE_BYTES } from "@/lib/constants";
+import { cn, formatBytes } from "@/lib/utils";
 
 export function DropZone({
   isDragging,
@@ -42,7 +43,10 @@ export function DropZone({
             <Upload className="h-7 w-7 text-foreground" />
           </span>
           <div className="text-base font-medium text-foreground">Drop files to upload</div>
-          <div className="mt-1 text-xs text-muted-foreground">PDF, Office files, images, and ZIP up to 50 MB</div>
+          <div className="mt-1 text-xs text-muted-foreground">
+            PDF, Office files, images, and ZIP up to{" "}
+            {formatBytes(MAX_FILE_SIZE_BYTES)}
+          </div>
         </div>
       </div>
     </div>
